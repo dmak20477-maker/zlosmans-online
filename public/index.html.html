@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ZLOSMANS | Online</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg: #0b0b0f; --neon: #00f3ff; --danger: #ff0055; --text: #ffffff; --glass: rgba(255,255,255,0.05); }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Montserrat', sans-serif; }
+        body { background: var(--bg); color: var(--text); text-align: center; padding: 20px; }
+        
+        h1 { font-size: 2.5rem; font-weight: 900; text-transform: uppercase; margin-bottom: 20px; }
+        h1 span { color: var(--neon); text-shadow: 0 0 15px rgba(0,243,255,0.5); }
+        
+        .screen { display: none; flex-direction: column; align-items: center; }
+        .screen.active { display: flex; }
+        
+        input { width: 100%; max-width: 300px; padding: 15px; background: rgba(0,0,0,0.5); border: 1px solid var(--neon); color: white; border-radius: 10px; margin-bottom: 15px; font-size: 1.2rem; text-align: center; }
+        .btn { background: transparent; border: 1px solid var(--neon); color: var(--neon); padding: 15px 40px; font-size: 1.2rem; font-weight: 700; border-radius: 50px; cursor: pointer; text-transform: uppercase; width: 100%; max-width: 300px; margin-bottom: 15px; }
+        .btn:active { background: var(--neon); color: var(--bg); }
+        
+        .board { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; max-width: 350px; width: 100%; margin: 20px auto; }
+        .cell { background: var(--glass); border: 2px solid rgba(0,243,255,0.2); height: 100px; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 3.5rem; font-weight: 900; cursor: pointer; }
+        .cell.x { color: var(--neon); }
+        .cell.o { color: var(--danger); }
+        
+        #status { font-size: 1.2rem; margin-bottom: 20px; color: #a0a0b5; }
+    </style>
+</head>
+<body>
+
+    <!-- Лобби -->
+    <div id="lobby-screen" class="screen active">
+        <h1>ZLOSMANS <span>ONLINE</span></h1>
+        <input type="text" id="player-name" placeholder="Твое имя">
+        <input type="text" id="room-id" placeholder="Название комнаты (код)">
+        <button class="btn" onclick="joinRoom()">Войти в игру</button>
+        <p style="color: gray; margin-top: 20px; font-size: 0.9rem;">Чтобы играть с другом, введите одинаковое название комнаты!</p>
+    </div>
+
+    <!-- Игровая доска -->
+    <div id="game-screen" class="screen">
+        <h1>Комната: <span id="display-room"></span></h1>
+        <p id="status">Ожидание игроков...</p>
+        <h2 style="margin-bottom: 10px;">Ты играешь за: <span id="my-symbol" style="color:var(--neon)"></span></h2>
+        
+        <div class="board" id="board">
+            <div class="cell" onclick="makeMove(0)"></div>
+            <div class="cell" onclick="makeMove(1)"></div>
+            <div class="cell" onclick="makeMove(2)"></div>
+            <div class="cell" onclick="makeMove(3)"></div>
+            <div class="cell" onclick="makeMove(4)"></div>
+            <div class="cell" onclick="makeMove(5)"></div>
+            <div class="cell" onclick="makeMove(6)"></div>
+            <div class="cell" onclick="makeMove(7)"></div>
+            <div class="cell" onclick="makeMove(8)"></div>
+        </div>
+        <button class="btn" onclick="restart()" style="margin-top: 20px;">Рестарт</button>
+    </div>
+
+    <!-- Подключаем логику онлайна -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        let mySymbol = "";
+        let currentRoom = "";
+
+        function joinRoom() {
+            const name = document.getElementById('player-name').value.trim();
+            currentRoom = document.getElementById('room-id').value.trim();
+            if (!name || !currentRoom) return alert("Заполни все поля!");
+
+            document.getElementById('display-room').innerText = currentRoom;
+            document.getElementById('lobby-screen').classList.remove('active');
+            document.getElementById('game-screen').classList.add('active');
+
+            socket.emit('join_room', { roomId: currentRoom, playerName: name });
+        }
+
+        socket.on('assigned_symbol', (symbol) => {
+            mySymbol = symbol;
+            document.getElementById('my-symbol').innerText = symbol;
+            document.getElementById('my-symbol').style.color = symbol === "X" ? "var(--neon)" : "var(--danger)";
+        });
+
+        socket.on('update_game', (data) => {
+            updateBoard(data.board);
+            if (data.players.length < 2) {
+                document.getElementById('status').innerText = "Ожидание второго игрока...";
+            } else {
+                const turnText = data.turn === mySymbol ? "ТВОЙ ХОД!" : "Ход противника...";
+                document.getElementById('status').innerText = turnText;
+                document.getElementById('status').style.color = data.turn === mySymbol ? "var(--neon)" : "gray";
+            }
+        });
+
+        socket.on('game_over', (data) => {
+            updateBoard(data.board);
+            if (data.winner === "Draw") {
+                document.getElementById('status').innerText = "НИЧЬЯ!";
+            } else {
+                const isMe = data.winner === mySymbol;
+                document.getElementById('status').innerText = isMe ? "🏆 ТЫ ПОБЕДИЛ!" : "💀 ТЫ ПРОИГРАЛ!";
+                document.getElementById('status').style.color = isMe ? "var(--neon)" : "var(--danger)";
+            }
+        });
+
+        function makeMove(index) {
+            socket.emit('make_move', { roomId: currentRoom, index: index, symbol: mySymbol });
+        }
+
+        function restart() {
+            socket.emit('restart_game', currentRoom);
+        }
+
+        function updateBoard(board) {
+            const cells = document.querySelectorAll('.cell');
+            board.forEach((val, i) => {
+                cells[i].innerText = val;
+                cells[i].className = "cell";
+                if (val === "X") cells[i].classList.add("x");
+                if (val === "O") cells[i].classList.add("o");
+            });
+        }
+    </script>
+</body>
+</html>
