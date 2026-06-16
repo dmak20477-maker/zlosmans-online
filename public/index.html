@@ -7,121 +7,178 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root { --bg: #0b0b0f; --neon: #00f3ff; --danger: #ff0055; --text: #ffffff; --glass: rgba(255,255,255,0.05); }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Montserrat', sans-serif; }
-        body { background: var(--bg); color: var(--text); text-align: center; padding: 20px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Montserrat', sans-serif; user-select: none; }
+        body { background: var(--bg); color: var(--text); text-align: center; padding: 15px; overflow-x: hidden; touch-action: manipulation; }
         
-        h1 { font-size: 2.5rem; font-weight: 900; text-transform: uppercase; margin-bottom: 20px; }
+        h1 { font-size: 2.2rem; font-weight: 900; text-transform: uppercase; margin-bottom: 15px; }
         h1 span { color: var(--neon); text-shadow: 0 0 15px rgba(0,243,255,0.5); }
         
-        .screen { display: none; flex-direction: column; align-items: center; }
+        .screen { display: none; flex-direction: column; align-items: center; width: 100%; height: 90vh; justify-content: center; }
         .screen.active { display: flex; }
         
-        input { width: 100%; max-width: 300px; padding: 15px; background: rgba(0,0,0,0.5); border: 1px solid var(--neon); color: white; border-radius: 10px; margin-bottom: 15px; font-size: 1.2rem; text-align: center; }
-        .btn { background: transparent; border: 1px solid var(--neon); color: var(--neon); padding: 15px 40px; font-size: 1.2rem; font-weight: 700; border-radius: 50px; cursor: pointer; text-transform: uppercase; width: 100%; max-width: 300px; margin-bottom: 15px; }
+        input, select { width: 100%; max-width: 300px; padding: 15px; background: rgba(0,0,0,0.5); border: 1px solid var(--neon); color: white; border-radius: 10px; margin-bottom: 15px; font-size: 1.1rem; text-align: center; outline: none; }
+        option { background: var(--bg); color: white; }
+        
+        .btn { background: var(--glass); border: 1px solid var(--neon); color: var(--neon); padding: 15px; font-size: 1.1rem; font-weight: 700; border-radius: 10px; cursor: pointer; text-transform: uppercase; width: 100%; max-width: 300px; margin-bottom: 10px; transition: all 0.2s; }
         .btn:active { background: var(--neon); color: var(--bg); }
+        .btn-danger { border-color: var(--danger); color: var(--danger); }
+        .btn-danger:active { background: var(--danger); color: white; }
         
-        .board { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; max-width: 350px; width: 100%; margin: 20px auto; }
-        .cell { background: var(--glass); border: 2px solid rgba(0,243,255,0.2); height: 100px; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 3.5rem; font-weight: 900; cursor: pointer; }
-        .cell.x { color: var(--neon); }
-        .cell.o { color: var(--danger); }
+        /* Тик-Так */
+        .board { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; max-width: 300px; width: 100%; margin: 20px auto; }
+        .cell { background: var(--glass); border: 2px solid rgba(0,243,255,0.2); height: 90px; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 3rem; font-weight: 900; cursor: pointer; color: white; }
         
-        #status { font-size: 1.2rem; margin-bottom: 20px; color: #a0a0b5; }
+        /* Дурак */
+        .durak-board { width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: space-between; position: relative; max-width: 500px; }
+        .top-panel { display: flex; justify-content: space-between; align-items: center; padding: 0 10px; color: #a0a0b5; font-size: 0.9rem; }
+        
+        .card { width: 55px; height: 80px; background: #15151c; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: 900; font-size: 1.2rem; cursor: pointer; flex-shrink: 0; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        .card.red { color: var(--danger); border-color: rgba(255,0,85,0.3); }
+        .card.black { color: white; }
+        .card:active { transform: translateY(-5px); border-color: var(--neon); }
+        
+        .hand { display: flex; justify-content: center; flex-wrap: wrap; gap: 5px; margin-top: 10px; min-height: 85px; }
+        .table-area { flex-grow: 1; border: 1px dashed rgba(0, 243, 255, 0.3); border-radius: 15px; margin: 15px 0; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 10px; padding: 10px; background: rgba(255, 255, 255, 0.02); }
+        
+        .controls { display: flex; gap: 10px; justify-content: center; margin-bottom: 10px; }
+        .controls .btn { padding: 10px; font-size: 0.9rem; margin: 0; }
+        
+        .trump-card { transform: rotate(90deg); margin-left: 10px; width: 40px; height: 60px; font-size: 0.9rem; }
     </style>
 </head>
 <body>
 
-    <!-- Лобби -->
+    <!-- Меню -->
     <div id="lobby-screen" class="screen active">
-        <h1>ZLOSMANS <span>ONLINE</span></h1>
+        <h1>ZLOSMANS <span>HUB</span></h1>
+        <select id="game-type">
+            <option value="durak">🃏 Карты: Дурак</option>
+            <option value="tictactoe">✖️ Крестики-Нолики</option>
+        </select>
         <input type="text" id="player-name" placeholder="Твое имя">
-        <input type="text" id="room-id" placeholder="Название комнаты (код)">
-        <button class="btn" onclick="joinRoom()">Войти в игру</button>
-        <p style="color: gray; margin-top: 20px; font-size: 0.9rem;">Чтобы играть с другом, введите одинаковое название комнаты!</p>
+        <input type="text" id="room-id" placeholder="Код комнаты (напр. 123)">
+        <button class="btn" onclick="joinRoom()">Играть</button>
     </div>
 
-    <!-- Игровая доска -->
-    <div id="game-screen" class="screen">
-        <h1>Комната: <span id="display-room"></span></h1>
-        <p id="status">Ожидание игроков...</p>
-        <h2 style="margin-bottom: 10px;">Ты играешь за: <span id="my-symbol" style="color:var(--neon)"></span></h2>
-        
-        <div class="board" id="board">
-            <div class="cell" onclick="makeMove(0)"></div>
-            <div class="cell" onclick="makeMove(1)"></div>
-            <div class="cell" onclick="makeMove(2)"></div>
-            <div class="cell" onclick="makeMove(3)"></div>
-            <div class="cell" onclick="makeMove(4)"></div>
-            <div class="cell" onclick="makeMove(5)"></div>
-            <div class="cell" onclick="makeMove(6)"></div>
-            <div class="cell" onclick="makeMove(7)"></div>
-            <div class="cell" onclick="makeMove(8)"></div>
+    <!-- Крестики -->
+    <div id="tictactoe-screen" class="screen">
+        <h2>Комната: <span class="display-room"></span></h2>
+        <p id="tic-status" style="margin: 10px 0;">Ожидание игрока...</p>
+        <div class="board" id="tic-board">
+            <div class="cell" onclick="makeTicMove(0)"></div>
+            <div class="cell" onclick="makeTicMove(1)"></div>
+            <div class="cell" onclick="makeTicMove(2)"></div>
+            <div class="cell" onclick="makeTicMove(3)"></div>
+            <div class="cell" onclick="makeTicMove(4)"></div>
+            <div class="cell" onclick="makeTicMove(5)"></div>
+            <div class="cell" onclick="makeTicMove(6)"></div>
+            <div class="cell" onclick="makeTicMove(7)"></div>
+            <div class="cell" onclick="makeTicMove(8)"></div>
         </div>
-        <button class="btn" onclick="restart()" style="margin-top: 20px;">Рестарт</button>
     </div>
 
-    <!-- Подключаем логику онлайна -->
+    <!-- Дурак -->
+    <div id="durak-screen" class="screen" style="justify-content: flex-start;">
+        <div class="durak-board">
+            
+            <div class="top-panel">
+                <div style="text-align: left;">
+                    Осталось: <span id="cards-left" style="color:white; font-weight:bold;">36</span><br>
+                    У врага: <span id="opp-cards" style="color:var(--danger); font-weight:bold;">0</span> шт.
+                </div>
+                <div style="display: flex; align-items: center;">
+                    Козырь:
+                    <div id="trump-display" class="card trump-card"></div>
+                </div>
+            </div>
+
+            <div class="table-area" id="durak-table">
+                <p style="color: gray; width: 100%;">Ждем второго игрока...</p>
+            </div>
+
+            <div class="controls" id="durak-controls" style="display:none;">
+                <button class="btn btn-danger" onclick="socket.emit('durak_take', currentRoom)">Беру</button>
+                <button class="btn" onclick="socket.emit('durak_bito', currentRoom)">Бито</button>
+            </div>
+
+            <div class="hand" id="my-hand"></div>
+            
+        </div>
+    </div>
+
     <script src="/socket.io/socket.io.js"></script>
     <script>
         const socket = io();
-        let mySymbol = "";
         let currentRoom = "";
+        let currentGame = "";
+        let mySymbol = "";
 
         function joinRoom() {
             const name = document.getElementById('player-name').value.trim();
             currentRoom = document.getElementById('room-id').value.trim();
-            if (!name || !currentRoom) return alert("Заполни все поля!");
+            currentGame = document.getElementById('game-type').value;
+            
+            if (!name || !currentRoom) return;
 
-            document.getElementById('display-room').innerText = currentRoom;
+            document.querySelectorAll('.display-room').forEach(el => el.innerText = currentRoom);
             document.getElementById('lobby-screen').classList.remove('active');
-            document.getElementById('game-screen').classList.add('active');
+            
+            if(currentGame === 'tictactoe') document.getElementById('tictactoe-screen').classList.add('active');
+            if(currentGame === 'durak') document.getElementById('durak-screen').classList.add('active');
 
-            socket.emit('join_room', { roomId: currentRoom, playerName: name });
+            socket.emit('join_room', { roomId: currentRoom, playerName: name, gameType: currentGame });
         }
 
-        socket.on('assigned_symbol', (symbol) => {
-            mySymbol = symbol;
-            document.getElementById('my-symbol').innerText = symbol;
-            document.getElementById('my-symbol').style.color = symbol === "X" ? "var(--neon)" : "var(--danger)";
-        });
+        socket.on('assigned_symbol', (symbol) => { mySymbol = symbol; });
 
         socket.on('update_game', (data) => {
-            updateBoard(data.board);
-            if (data.players.length < 2) {
-                document.getElementById('status').innerText = "Ожидание второго игрока...";
-            } else {
-                const turnText = data.turn === mySymbol ? "ТВОЙ ХОД!" : "Ход противника...";
-                document.getElementById('status').innerText = turnText;
-                document.getElementById('status').style.color = data.turn === mySymbol ? "var(--neon)" : "gray";
+            if (data.gameType === 'tictactoe') {
+                const cells = document.querySelectorAll('.cell');
+                data.board.forEach((val, i) => { 
+                    cells[i].innerText = val; 
+                    cells[i].style.color = val === 'X' ? 'var(--neon)' : 'var(--danger)';
+                });
+                const tStatus = document.getElementById('tic-status');
+                if(!data.active) tStatus.innerText = "Ожидание второго игрока...";
+                else tStatus.innerText = data.turn === mySymbol ? "ТВОЙ ХОД!" : "Ход противника...";
+            } 
+            else if (data.gameType === 'durak') {
+                if(data.active) {
+                    document.getElementById('durak-controls').style.display = 'flex';
+                }
+
+                document.getElementById('opp-cards').innerText = data.opponentCardsCount;
+                document.getElementById('cards-left').innerText = data.cardsLeft;
+                
+                const t = document.getElementById('trump-display');
+                if (data.trump) {
+                    t.className = `card trump-card ${data.trump.color}`;
+                    t.innerHTML = `${data.trump.rank}<br>${data.trump.suit}`;
+                } else {
+                    t.style.display = 'none'; // Если козырь забрали
+                }
+
+                // Рендер моих карт
+                const handBox = document.getElementById('my-hand');
+                handBox.innerHTML = '';
+                data.myHand.forEach((card, index) => {
+                    handBox.innerHTML += `<div class="card ${card.color}" onclick="socket.emit('play_card', { roomId: '${currentRoom}', cardIndex: ${index} })">${card.rank}<br>${card.suit}</div>`;
+                });
+
+                // Рендер стола
+                const tableBox = document.getElementById('durak-table');
+                tableBox.innerHTML = '';
+                if(data.table.length === 0 && data.active) {
+                    tableBox.innerHTML = '<p style="color: gray;">Стол пуст. Ваш ход!</p>';
+                }
+                data.table.forEach(card => {
+                    tableBox.innerHTML += `<div class="card ${card.color}">${card.rank}<br>${card.suit}</div>`;
+                });
             }
         });
 
-        socket.on('game_over', (data) => {
-            updateBoard(data.board);
-            if (data.winner === "Draw") {
-                document.getElementById('status').innerText = "НИЧЬЯ!";
-            } else {
-                const isMe = data.winner === mySymbol;
-                document.getElementById('status').innerText = isMe ? "🏆 ТЫ ПОБЕДИЛ!" : "💀 ТЫ ПРОИГРАЛ!";
-                document.getElementById('status').style.color = isMe ? "var(--neon)" : "var(--danger)";
-            }
-        });
-
-        function makeMove(index) {
+        function makeTicMove(index) {
             socket.emit('make_move', { roomId: currentRoom, index: index, symbol: mySymbol });
-        }
-
-        function restart() {
-            socket.emit('restart_game', currentRoom);
-        }
-
-        function updateBoard(board) {
-            const cells = document.querySelectorAll('.cell');
-            board.forEach((val, i) => {
-                cells[i].innerText = val;
-                cells[i].className = "cell";
-                if (val === "X") cells[i].classList.add("x");
-                if (val === "O") cells[i].classList.add("o");
-            });
         }
     </script>
 </body>
