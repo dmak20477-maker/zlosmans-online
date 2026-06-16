@@ -89,22 +89,19 @@ io.on('connection', (socket) => {
             room.quizScores[room.players[0].id] = 0; room.quizScores[room.players[1].id] = 0;
         }
 
-        // --- ЗАПУСК ПИНГ-ПОНГА (REAL-TIME) ---
+        // --- ЗАПУСК ПИНГ-ПОНГА ---
         if (room.players.length === 2 && room.gameType === 'pingpong' && !room.active) {
             room.active = true;
             room.pong = { p1Y: 40, p2Y: 40, bX: 50, bY: 50, dX: 2, dY: 2, s1: 0, s2: 0 };
             
-            // Игровой цикл Пинг-Понга на сервере (30 кадров в сек)
             room.pongInterval = setInterval(() => {
                 let p = room.pong;
                 p.bX += p.dX; p.bY += p.dY;
                 
-                if(p.bY <= 0 || p.bY >= 100) p.dY *= -1; // Отскок от верха/низа
-                // Отскок от ракеток
+                if(p.bY <= 0 || p.bY >= 100) p.dY *= -1;
                 if(p.bX <= 5 && p.bY >= p.p1Y && p.bY <= p.p1Y + 20) p.dX = Math.abs(p.dX);
                 if(p.bX >= 95 && p.bY >= p.p2Y && p.bY <= p.p2Y + 20) p.dX = -Math.abs(p.dX);
                 
-                // Голы
                 if(p.bX < 0) { p.s2++; p.bX=50; p.bY=50; p.dX=2; }
                 if(p.bX > 100) { p.s1++; p.bX=50; p.bY=50; p.dX=-2; }
 
@@ -165,4 +162,59 @@ io.on('connection', (socket) => {
             if (answerIndex === quizQuestions[room.quizIndex].right) room.quizScores[socket.id] += 10;
             room.quizIndex++;
             if (room.quizIndex >= quizQuestions.length) room.active = false;
-            updateRoomState
+            updateRoomState(roomId);
+        }
+    });
+
+    // --- ДУРАК ---
+    socket.on('play_card', ({ roomId, cardIndex }) => {
+        const room = rooms[roomId];
+        if (room && room.gameType === 'durak') {
+            const player = room.players.find(p => p.id === socket.id);
+            if (player && player.hand[cardIndex]) {
+                room.table.push(player.hand.splice(cardIndex, 1)[0]);
+                updateRoomState(roomId);
+            }
+        }
+    });
+    socket.on('durak_bito', (roomId) => {
+        const room = rooms[roomId];
+        if (room && room.gameType === 'durak') { room.table = []; dealCards(room); updateRoomState(roomId); }
+    });
+    socket.on('durak_take', (roomId) => {
+        const room = rooms[roomId];
+        if (room && room.gameType === 'durak') {
+            const player = room.players.find(p => p.id === socket.id);
+            if (player) { player.hand = player.hand.concat(room.table); room.table = []; dealCards(room); updateRoomState(roomId); }
+        }
+    });
+
+    function dealCards(room) {
+        room.players.forEach(p => { while (p.hand.length < 6 && room.deck.length > 0) p.hand.push(room.deck.pop()); });
+        room.players.forEach(p => { if (p.hand.length < 6 && room.trump) { p.hand.push(room.trump); room.trump = null; } });
+    }
+
+    function updateRoomState(roomId) {
+        const room = rooms[roomId];
+        if (!room) return;
+        room.players.forEach(player => {
+            const opponent = room.players.find(p => p.id !== player.id);
+            io.to(player.id).emit('update_game', {
+                gameType: room.gameType, turn: room.turn, active: room.active,
+                board: room.board, chkBoard: room.chkBoard,
+                sea1: room.sea1, sea2: room.sea2,
+                quizIndex: room.quizIndex, quizQuestion: quizQuestions[room.quizIndex] || null, quizScores: room.quizScores,
+                myHand: player.hand, opponentCardsCount: opponent ? opponent.hand.length : 0, table: room.table, trump: room.trump, cardsLeft: room.deck ? room.deck.length : 0
+            });
+        });
+    }
+
+    socket.on('disconnect', () => {
+        // Очистка интервала пинг-понга при выходе
+        if (rooms[roomId] && rooms[roomId].pongInterval) clearInterval(rooms[roomId].pongInterval);
+        console.log(`Отключился: ${socket.id}`); 
+    });
+});
+
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => console.log(`Сервер работает на порту ${PORT}`));
