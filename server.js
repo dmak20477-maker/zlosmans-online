@@ -76,7 +76,6 @@ io.on('connection', (socket) => {
     socket.on('pong_move', ({ roomId, y, symbol }) => { if (rooms[roomId] && rooms[roomId].gameType === 'pingpong') { symbol === "X" ? rooms[roomId].pong.p1Y = y : rooms[roomId].pong.p2Y = y; } });
     socket.on('make_move', ({ roomId, index, symbol }) => { let r = rooms[roomId]; if (r && r.gameType === 'tictactoe' && r.board[index] === "" && r.turn === symbol) { r.board[index] = symbol; r.turn = r.turn === "X" ? "O" : "X"; updateRoomState(roomId); } });
     
-    // ОНЛАЙН ШАШКИ (С РУБКОЙ ФИГУР)
     socket.on('move_checker', ({ roomId, from, to, symbol }) => { 
         let r = rooms[roomId]; const piece = symbol === "X" ? 1 : 2; 
         if (r && r.gameType === 'checkers' && r.turn === symbol) { 
@@ -91,7 +90,7 @@ io.on('connection', (socket) => {
                     let mid = from + (to - from) / 2;
                     let enemy = symbol === "X" ? 2 : 1;
                     if (r.chkBoard[mid] === enemy) {
-                        r.chkBoard[to] = piece; r.chkBoard[from] = 0; r.chkBoard[mid] = 0; // Съели!
+                        r.chkBoard[to] = piece; r.chkBoard[from] = 0; r.chkBoard[mid] = 0;
                         r.turn = r.turn === "X" ? "O" : "X"; updateRoomState(roomId);
                     }
                 }
@@ -124,7 +123,7 @@ io.on('connection', (socket) => {
     });
 });
 
-const PORT = process.env.PORT || 3000;
+// ФИНАЛЬНАЯ ЧАСТЬ С ЗАПУСКОМ ОБЛАЧНОГО БОТА (БЕЗ ДУБЛЕЙ ПОРТОВ)
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
     console.log(`=========================================`);
@@ -133,7 +132,7 @@ server.listen(PORT, () => {
     console.log(`🔥 Порт: ${PORT}`);
     console.log(`=========================================`);
 
-    // ЗАПУСК ТЕЛЕГРАМ-БОТА ПРЯМО ИЗ ОБЛАКА РЯДОМ С ИГРАМИ
+    // Запускаем бота через child_process
     try {
         const { exec } = require('child_process');
         console.log('📡 Попытка пробуждения Telegram-бота в облаке...');
