@@ -125,4 +125,32 @@ io.on('connection', (socket) => {
 });
 
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => console.log(`ПЛОВЦЕНТР запущен на порту ${PORT}`));
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => {
+    console.log(`=========================================`);
+    console.log(`🚀 СЕРВЕР ПЛОВЦЕНТР УСПЕШНО ЗАПУЩЕН!`);
+    console.log(`💎 Автор: Денис Максатбеков))`);
+    console.log(`🔥 Порт: ${PORT}`);
+    console.log(`=========================================`);
+
+    // ЗАПУСК ТЕЛЕГРАМ-БОТА ПРЯМО ИЗ ОБЛАКА РЯДОМ С ИГРАМИ
+    try {
+        const { exec } = require('child_process');
+        console.log('📡 Попытка пробуждения Telegram-бота в облаке...');
+        
+        const botProcess = exec('node bot.js', (err, stdout, stderr) => {
+            if (err) {
+                console.error(`❌ Ошибка запуска бота: ${err.message}`);
+                return;
+            }
+            if (stderr) console.error(`⚠️ Логи бота (stderr): ${stderr}`);
+            console.log(`🤖 Логи бота (stdout): ${stdout}`);
+        });
+
+        botProcess.stdout.on('data', (data) => console.log(`[BOT]: ${data.trim()}`));
+        botProcess.stderr.on('data', (data) => console.error(`[BOT ERROR]: ${data.trim()}`));
+
+    } catch (e) {
+        console.error('❌ Не удалось запустить фоновый процесс бота:', e);
+    }
+});
