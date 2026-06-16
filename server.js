@@ -34,6 +34,14 @@ function getPublicRooms() {
     return publicRooms;
 }
 
+// ФУНКЦИЯ ЗАВЕРШЕНИЯ ИГРЫ
+function finishGame(roomId, winnerName, reason) {
+    if(!rooms[roomId]) return;
+    rooms[roomId].active = false;
+    io.to(roomId).emit('game_over', { winner: winnerName, reason: reason });
+    if(rooms[roomId].pongInterval) clearInterval(rooms[roomId].pongInterval);
+}
+
 io.on('connection', (socket) => {
     socket.emit('update_room_list', getPublicRooms());
 
@@ -67,6 +75,10 @@ io.on('connection', (socket) => {
                     if(p.bX >= 95 && p.bY >= p.p2Y && p.bY <= p.p2Y + 20) p.dX = -Math.abs(p.dX);
                     if(p.bX < 0) { p.s2++; p.bX=50; p.bY=50; p.dX=2; } if(p.bX > 100) { p.s1++; p.bX=50; p.bY=50; p.dX=-2; }
                     io.to(roomId).emit('update_pong', p);
+
+                    // ПОБЕДА В ПИНГ ПОНГЕ (ДО 5 ОЧКОВ)
+                    if(p.s1 >= 5) finishGame(roomId, room.players[0].name, "Разгром всухую!");
+                    if(p.s2 >= 5) finishGame(roomId, room.players[1].name, "Разгром всухую!");
                 }, 33);
             }
         }
@@ -74,8 +86,26 @@ io.on('connection', (socket) => {
     });
 
     socket.on('pong_move', ({ roomId, y, symbol }) => { if (rooms[roomId] && rooms[roomId].gameType === 'pingpong') { symbol === "X" ? rooms[roomId].pong.p1Y = y : rooms[roomId].pong.p2Y = y; } });
-    socket.on('make_move', ({ roomId, index, symbol }) => { let r = rooms[roomId]; if (r && r.gameType === 'tictactoe' && r.board[index] === "" && r.turn === symbol) { r.board[index] = symbol; r.turn = r.turn === "X" ? "O" : "X"; updateRoomState(roomId); } });
     
+    // ПРАВИЛА КРЕСТИКОВ
+    socket.on('make_move', ({ roomId, index, symbol }) => { 
+        let r = rooms[roomId]; 
+        if (r && r.gameType === 'tictactoe' && r.board[index] === "" && r.turn === symbol) { 
+            r.board[index] = symbol; r.turn = r.turn === "X" ? "O" : "X"; 
+            updateRoomState(roomId); 
+            
+            const wins = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+            for(let combo of wins) {
+                if(r.board[combo[0]] && r.board[combo[0]] === r.board[combo[1]] && r.board[combo[0]] === r.board[combo[2]]) {
+                    let winner = r.players.find(p => p.symbol === r.board[combo[0]]).name;
+                    return finishGame(roomId, winner, "Крестики-Нолики");
+                }
+            }
+            if(!r.board.includes("")) finishGame(roomId, "НИЧЬЯ", "Победила дружба");
+        } 
+    });
+    
+    // ПРАВИЛА ШАШЕК
     socket.on('move_checker', ({ roomId, from, to, symbol }) => { 
         let r = rooms[roomId]; const piece = symbol === "X" ? 1 : 2; 
         if (r && r.gameType === 'checkers' && r.turn === symbol) { 
@@ -84,28 +114,74 @@ io.on('connection', (socket) => {
             let isJump = Math.abs(r2-r1) === 2 && Math.abs(c2-c1) === 2;
             
             if (r.chkBoard[from] === piece && r.chkBoard[to] === 0) { 
-                if (isNormal) {
-                    r.chkBoard[to] = piece; r.chkBoard[from] = 0; r.turn = r.turn === "X" ? "O" : "X"; updateRoomState(roomId);
-                } else if (isJump) {
-                    let mid = from + (to - from) / 2;
-                    let enemy = symbol === "X" ? 2 : 1;
-                    if (r.chkBoard[mid] === enemy) {
-                        r.chkBoard[to] = piece; r.chkBoard[from] = 0; r.chkBoard[mid] = 0;
-                        r.turn = r.turn === "X" ? "O" : "X"; updateRoomState(roomId);
-                    }
+                let moved = false;
+                if (isNormal) { r.chkBoard[to] = piece; r.chkBoard[from] = 0; moved = true; } 
+                else if (isJump) {
+                    let mid = from + (to - from) / 2; let enemy = symbol === "X" ? 2 : 1;
+                    if (r.chkBoard[mid] === enemy) { r.chkBoard[to] = piece; r.chkBoard[from] = 0; r.chkBoard[mid] = 0; moved = true; }
+                }
+                
+                if (moved) {
+                    r.turn = r.turn === "X" ? "O" : "X"; updateRoomState(roomId);
+                    // ПРОВЕРКА ПОБЕДЫ В ШАШКАХ
+                    if(!r.chkBoard.includes(1)) return finishGame(roomId, r.players.find(p=>p.symbol==="O").name, "Все шашки съедены!");
+                    if(!r.chkBoard.includes(2)) return finishGame(roomId, r.players.find(p=>p.symbol==="X").name, "Все шашки съедены!");
                 }
             } 
         } 
     });
 
-    socket.on('sea_shoot', ({ roomId, index }) => { let r = rooms[roomId]; if (r && r.gameType === 'seabattle' && r.turn === socket.id && r.active) { const opp = r.players.find(p => p.id !== socket.id); const tF = opp.symbol === "X" ? r.sea1 : r.sea2; if (tF[index] === 0) { tF[index] = 2; r.turn = opp.id; } else if (tF[index] === 1) { tF[index] = 3; if (!tF.includes(1)) r.active = false; } updateRoomState(roomId); } });
-    socket.on('quiz_answer', ({ roomId, answerIndex }) => { let r = rooms[roomId]; if (r && r.gameType === 'quiz' && r.active) { if (answerIndex === quizQuestions[r.quizIndex].right) r.quizScores[socket.id] += 10; r.quizIndex++; if (r.quizIndex >= quizQuestions.length) r.active = false; updateRoomState(roomId); } });
+    // ПРАВИЛА МОРСКОГО БОЯ
+    socket.on('sea_shoot', ({ roomId, index }) => { 
+        let r = rooms[roomId]; 
+        if (r && r.gameType === 'seabattle' && r.turn === socket.id && r.active) { 
+            const p = r.players.find(pl => pl.id === socket.id);
+            const opp = r.players.find(pl => pl.id !== socket.id); 
+            const tF = opp.symbol === "X" ? r.sea1 : r.sea2; 
+            
+            if (tF[index] === 0) { tF[index] = 2; r.turn = opp.id; } 
+            else if (tF[index] === 1) { 
+                tF[index] = 3; 
+                // ПРОВЕРКА ПОБЕДЫ МОРСКОЙ БОЙ
+                if (!tF.includes(1)) { updateRoomState(roomId); return finishGame(roomId, p.name, "Флот противника уничтожен!"); }
+            } 
+            updateRoomState(roomId); 
+        } 
+    });
+
+    // ПРАВИЛА КВИЗА
+    socket.on('quiz_answer', ({ roomId, answerIndex }) => { 
+        let r = rooms[roomId]; 
+        if (r && r.gameType === 'quiz' && r.active) { 
+            if (answerIndex === quizQuestions[r.quizIndex].right) r.quizScores[socket.id] += 10; 
+            r.quizIndex++; 
+            if (r.quizIndex >= quizQuestions.length) {
+                let p1 = r.players[0]; let p2 = r.players[1];
+                let winner = "НИЧЬЯ";
+                if (r.quizScores[p1.id] > r.quizScores[p2.id]) winner = p1.name;
+                if (r.quizScores[p2.id] > r.quizScores[p1.id]) winner = p2.name;
+                finishGame(roomId, winner, "Самый умный!");
+            }
+            updateRoomState(roomId); 
+        } 
+    });
     
-    socket.on('play_card', ({ roomId, cardIndex }) => { let r = rooms[roomId]; if (r && r.gameType === 'durak') { const p = r.players.find(pl => pl.id === socket.id); if (p && p.hand[cardIndex]) { r.table.push(p.hand.splice(cardIndex, 1)[0]); updateRoomState(roomId); } } });
-    socket.on('durak_bito', (roomId) => { let r = rooms[roomId]; if (r && r.gameType === 'durak') { r.table = []; dealCards(r); updateRoomState(roomId); } });
-    socket.on('durak_take', (roomId) => { let r = rooms[roomId]; if (r && r.gameType === 'durak') { const p = r.players.find(pl => pl.id === socket.id); if (p) { p.hand = p.hand.concat(r.table); r.table = []; dealCards(r); updateRoomState(roomId); } } });
+    // ПРАВИЛА ДУРАКА
+    socket.on('play_card', ({ roomId, cardIndex }) => { let r = rooms[roomId]; if (r && r.gameType === 'durak') { const p = r.players.find(pl => pl.id === socket.id); if (p && p.hand[cardIndex]) { r.table.push(p.hand.splice(cardIndex, 1)[0]); updateRoomState(roomId); checkDurakWin(r, roomId); } } });
+    socket.on('durak_bito', (roomId) => { let r = rooms[roomId]; if (r && r.gameType === 'durak') { r.table = []; dealCards(r); updateRoomState(roomId); checkDurakWin(r, roomId); } });
+    socket.on('durak_take', (roomId) => { let r = rooms[roomId]; if (r && r.gameType === 'durak') { const p = r.players.find(pl => pl.id === socket.id); if (p) { p.hand = p.hand.concat(r.table); r.table = []; dealCards(r); updateRoomState(roomId); checkDurakWin(r, roomId); } } });
+    
     function dealCards(room) { room.players.forEach(p => { while (p.hand.length < 6 && room.deck.length > 0) p.hand.push(room.deck.pop()); }); room.players.forEach(p => { if (p.hand.length < 6 && room.trump) { p.hand.push(room.trump); room.trump = null; } }); }
     
+    function checkDurakWin(room, roomId) {
+        if (room.deck.length === 0 && !room.trump) {
+            let p1 = room.players[0]; let p2 = room.players[1];
+            if (p1.hand.length === 0 && p2.hand.length > 0) finishGame(roomId, p1.name, "Оставил в Дураках!");
+            if (p2.hand.length === 0 && p1.hand.length > 0) finishGame(roomId, p2.name, "Оставил в Дураках!");
+            if (p1.hand.length === 0 && p2.hand.length === 0) finishGame(roomId, "НИЧЬЯ", "Колода пуста");
+        }
+    }
+
     function updateRoomState(roomId) {
         if (!rooms[roomId]) return;
         rooms[roomId].players.forEach(player => {
@@ -117,7 +193,7 @@ io.on('connection', (socket) => {
     socket.on('disconnect', () => {
         for (let roomId in rooms) {
             const pIndex = rooms[roomId].players.findIndex(p => p.id === socket.id);
-            if (pIndex !== -1) { rooms[roomId].players.splice(pIndex, 1); if (rooms[roomId].pongInterval) clearInterval(rooms[roomId].pongInterval); if (rooms[roomId].players.length === 0) delete rooms[roomId]; else { rooms[roomId].active = false; updateRoomState(roomId); } }
+            if (pIndex !== -1) { rooms[roomId].players.splice(pIndex, 1); if (rooms[roomId].pongInterval) clearInterval(rooms[roomId].pongInterval); if (rooms[roomId].players.length === 0) delete rooms[roomId]; else { rooms[roomId].active = false; finishGame(roomId, "ПРОТИВНИК", "Враг сбежал с поля боя!"); } }
         }
         io.emit('update_room_list', getPublicRooms());
     });
@@ -133,21 +209,7 @@ server.listen(PORT, () => {
 
     try {
         const { exec } = require('child_process');
-        console.log('📡 Попытка пробуждения Telegram-бота в облаке...');
-        
-        const botProcess = exec('node bot.js', (err, stdout, stderr) => {
-            if (err) {
-                console.error(`❌ Ошибка запуска бота: ${err.message}`);
-                return;
-            }
-            if (stderr) console.error(`⚠️ Логи бота (stderr): ${stderr}`);
-            console.log(`🤖 Логи бота (stdout): ${stdout}`);
-        });
-
+        const botProcess = exec('node bot.js', (err, stdout, stderr) => { if (err) return; });
         botProcess.stdout.on('data', (data) => console.log(`[BOT]: ${data.trim()}`));
-        botProcess.stderr.on('data', (data) => console.error(`[BOT ERROR]: ${data.trim()}`));
-
-    } catch (e) {
-        console.error('❌ Не удалось запустить фоновый процесс бота:', e);
-    }
+    } catch (e) { console.error('Ошибка бота:', e); }
 });
