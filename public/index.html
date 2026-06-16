@@ -7,105 +7,96 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root { --pool-cyan: #00f3ff; --danger: #ff0055; --text: #ffffff; --glass: rgba(255,255,255,0.08); --success: #00ff64; --purple: #b700ff; --gold: #ffd700; }
-        
-        /* Сброс выделений и настройка под пальцы */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Montserrat', sans-serif; user-select: none; -webkit-tap-highlight-color: transparent; }
-        
-        /* Роскошный фон: эффект ночного бассейна и темного глянца */
-        body { 
-            background: radial-gradient(circle at 50% 0%, #0a192f 0%, #030305 80%);
-            color: var(--text); text-align: center; 
-            padding: env(safe-area-inset-top) 15px env(safe-area-inset-bottom) 15px; 
-            overflow-x: hidden; overscroll-behavior-y: contain; touch-action: pan-x pan-y;
-        }
-        
+        body { background: radial-gradient(circle at 50% 0%, #0a192f 0%, #030305 80%); color: var(--text); text-align: center; padding: env(safe-area-inset-top) 15px env(safe-area-inset-bottom) 15px; overflow-x: hidden; overscroll-behavior-y: contain; touch-action: pan-x pan-y; }
         .author-tag { position: absolute; top: 10px; right: 15px; font-size: 0.7rem; color: rgba(255,255,255,0.4); font-weight: 700; text-transform: uppercase; z-index: 100; letter-spacing: 1px; }
         
-        /* Бриллиантовая типографика */
         h1 { font-size: 2.2rem; font-weight: 900; text-transform: uppercase; margin-bottom: 20px; line-height: 1.1; }
-        h1 span { 
-            background: linear-gradient(135deg, #ffffff 0%, #b3e5fc 25%, var(--pool-cyan) 50%, #b3e5fc 75%, #ffffff 100%);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 15px rgba(0, 243, 255, 0.6), 0 0 30px rgba(255, 255, 255, 0.1);
-        }
+        h1 span { background: linear-gradient(135deg, #ffffff 0%, #b3e5fc 25%, var(--pool-cyan) 50%, #b3e5fc 75%, #ffffff 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 15px rgba(0, 243, 255, 0.6), 0 0 30px rgba(255, 255, 255, 0.1); }
 
         .screen { display: none; flex-direction: column; align-items: center; width: 100%; min-height: 90vh; justify-content: center; animation: fadeIn 0.3s; position: relative; }
         .screen.active { display: flex; }
         @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
         
-        /* Увеличенные мобильные инпуты */
         input, select { width: 100%; max-width: 320px; padding: 15px; background: rgba(0,0,0,0.6); border: 1px solid var(--pool-cyan); color: white; border-radius: 12px; margin-bottom: 12px; font-size: 1.1rem; text-align: center; outline: none; box-shadow: inset 0 0 10px rgba(0,0,0,0.8); }
         option { background: #030305; color: white; }
         
-        /* Толстые кнопки для больших пальцев */
         .btn { background: var(--glass); border: 1px solid var(--pool-cyan); color: var(--pool-cyan); padding: 16px; font-size: 1.1rem; font-weight: 700; border-radius: 12px; cursor: pointer; text-transform: uppercase; width: 100%; max-width: 320px; margin-bottom: 12px; transition: 0.1s; box-shadow: 0 4px 15px rgba(0,0,0,0.3), inset 0 0 10px rgba(0,243,255,0.1); backdrop-filter: blur(5px); }
         .btn:active { background: var(--pool-cyan); color: #000; transform: scale(0.96); box-shadow: 0 0 20px var(--pool-cyan); }
         .btn-danger { border-color: var(--danger); color: var(--danger); box-shadow: inset 0 0 10px rgba(255,0,85,0.1); }
         .btn-danger:active { background: var(--danger); color: white; box-shadow: 0 0 20px var(--danger); }
         .btn-purple { border-color: var(--purple); color: var(--purple); }
-        .btn-purple:active { background: var(--purple); color: white; }
         .btn-gold { border-color: var(--gold); color: var(--gold); }
-        .btn-gold:active { background: var(--gold); color: black; }
-
-        /* Лобби комнат */
-        .room-item { background: var(--glass); border: 1px solid rgba(0,243,255,0.3); padding: 15px; border-radius: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 320px; }
-        .room-item:active { background: var(--pool-cyan); }
-
+        .room-item { background: var(--glass); border: 1px solid rgba(0,243,255,0.3); padding: 15px; border-radius: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 320px; cursor: pointer; }
+        
         /* Игровые доски */
         .board { display: grid; gap: 5px; width: 100%; margin: 20px auto; max-width: 320px; }
-        .cell { background: var(--glass); border: 2px solid rgba(0,243,255,0.2); aspect-ratio: 1; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 3rem; font-weight: 900; color: white; }
-        
+        .cell { background: var(--glass); border: 2px solid rgba(0,243,255,0.2); aspect-ratio: 1; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 3rem; font-weight: 900; color: white; cursor: pointer;}
         .chk-board { display: grid; grid-template-columns: repeat(8, 1fr); gap: 2px; width: 100%; max-width: 340px; margin: 15px auto; background: var(--pool-cyan); padding: 2px; border-radius: 8px; }
         .chk-cell { background: #15151c; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; }
         .chk-cell.white { background: #e0e0e0; }
-        .chk-piece { width: 85%; height: 85%; border-radius: 50%; box-shadow: inset 0 0 10px rgba(0,0,0,0.8), 0 4px 5px rgba(0,0,0,0.5); }
+        .chk-piece { width: 85%; height: 85%; border-radius: 50%; box-shadow: inset 0 0 10px rgba(0,0,0,0.8); cursor: pointer; }
         .chk-piece.p1 { background: var(--pool-cyan); }
         .chk-piece.p2 { background: var(--danger); }
         .chk-piece.selected { transform: scale(1.15); border: 3px solid white; }
 
-        /* Дурак */
-        .card { width: 60px; height: 90px; background: #15151c; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: 900; font-size: 1.3rem; box-shadow: 0 6px 15px rgba(0,0,0,0.6); }
+        .card { width: 60px; height: 90px; background: #15151c; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: 900; font-size: 1.3rem; box-shadow: 0 6px 15px rgba(0,0,0,0.6); cursor:pointer;}
         .card.red { color: var(--danger); border-color: rgba(255,0,85,0.3); }
         .hand { display: flex; justify-content: center; flex-wrap: wrap; gap: 5px; margin-top: 10px; }
 
-        /* Танки */
-        #tank-canvas { background: #08080a; border: 2px solid var(--success); border-radius: 12px; box-shadow: 0 0 20px rgba(0, 255, 100, 0.15); max-width: 100%; image-rendering: pixelated; }
+        #tank-canvas { background: #08080a; border: 2px solid var(--success); border-radius: 12px; max-width: 100%; image-rendering: pixelated; }
         .tank-controls { width: 100%; max-width: 340px; display: flex; justify-content: space-between; padding: 10px; }
         .t-pad { display: grid; grid-template-columns: repeat(3, 45px); gap: 5px; }
         .t-btn { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); height: 45px; border-radius: 8px; display: flex; justify-content: center; align-items: center; font-size: 1.5rem; color: white; }
-        .t-btn:active { background: white; color: black; }
         .t-fire { background: rgba(255,0,85,0.2); border: 2px solid var(--danger); width: 65px; height: 65px; border-radius: 50%; font-weight: 900; display: flex; align-items:center; justify-content:center; }
-        .t-fire:active { background: var(--danger); color: white; box-shadow: 0 0 20px var(--danger); }
         .p2-controls { transform: rotate(180deg); }
-
-        /* Пинг-Понг */
-        #pong-container { width: 100%; max-width: 340px; aspect-ratio: 1; background: #0a0a0f; border: 2px solid var(--pool-cyan); position: relative; touch-action: none; border-radius: 12px; overflow: hidden; box-shadow: inset 0 0 30px rgba(0,243,255,0.1); }
-        .pong-paddle { position: absolute; width: 4%; height: 20%; background: white; border-radius: 5px; box-shadow: 0 0 10px white; }
-        #pong-ball { position: absolute; width: 5%; height: 5%; background: var(--success); border-radius: 50%; transform: translate(-50%, -50%); box-shadow: 0 0 15px var(--success); }
+        #pong-container { width: 100%; max-width: 340px; aspect-ratio: 1; background: #0a0a0f; border: 2px solid var(--pool-cyan); position: relative; touch-action: none; border-radius: 12px; overflow: hidden; }
+        .pong-paddle { position: absolute; width: 4%; height: 20%; background: white; border-radius: 5px; }
+        #pong-ball { position: absolute; width: 5%; height: 5%; background: var(--success); border-radius: 50%; transform: translate(-50%, -50%); }
     </style>
 </head>
 <body>
-    <div class="author-tag">Автор: Денис Максатбеков)) | @zlosmans</div>
+    <div class="author-tag">Автор: Денис Максатбеков)) | @prodelal</div>
 
+    <!-- МЕНЮ -->
     <div id="main-menu" class="screen active">
         <h1>ПЛОВЦЕНТР <span>HUB</span></h1>
         <button class="btn btn-purple" onclick="showScreen('offline-menu')">🍻 ОФФЛАЙН (Рядом)</button>
         <button class="btn" onclick="showScreen('online-lobby')">🌐 ОНЛАЙН (Сетевая)</button>
     </div>
 
+    <!-- ОФФЛАЙН -->
     <div id="offline-menu" class="screen">
         <h1>ОФФЛАЙН <span>ИГРЫ</span></h1>
-        <button class="btn btn-success" style="border-color:var(--success); color:var(--success);" onclick="showScreen('tanks-screen'); initTanks();">💥 Танки 2D (Дуэль)</button>
+        
+        <div style="background:var(--glass); padding:10px; border-radius:10px; margin-bottom:10px; width:100%; max-width:320px;">
+            <p style="color:var(--success); margin-bottom:5px; font-weight:bold;">💥 ТАНКИ 2D</p>
+            <select id="tank-mode" style="margin-bottom:5px;"><option value="pvp">С другом (PVP)</option><option value="bot">С Ботом (ИИ)</option></select>
+            <button class="btn btn-success" style="border-color:var(--success); color:var(--success);" onclick="showScreen('tanks-screen'); initTanks();">ИГРАТЬ</button>
+        </div>
+
+        <div style="background:var(--glass); padding:10px; border-radius:10px; margin-bottom:10px; width:100%; max-width:320px;">
+            <p style="color:white; margin-bottom:5px; font-weight:bold;">🏁 ШАШКИ</p>
+            <select id="chk-mode" style="margin-bottom:5px;"><option value="pvp">С другом (PVP)</option><option value="bot">С Ботом (ИИ)</option></select>
+            <button class="btn" onclick="showScreen('off-checkers-screen'); startOffChk();">ИГРАТЬ</button>
+        </div>
+
         <button class="btn" onclick="showScreen('mafia-setup')">🕵️‍♂️ Умная Мафия</button>
-        <button class="btn btn-gold" onclick="showScreen('rush-screen'); startRush();">💎 Алмазная Лихорадка</button>
-        <button class="btn" onclick="showScreen('off-checkers-screen'); startOffChk();">🏁 Шашки</button>
-        <button class="btn btn-danger" onclick="showScreen('main-menu')" style="margin-top: 20px;">Назад</button>
+        <button class="btn btn-gold" onclick="showScreen('rush-screen'); startRush();">💎 Лихорадка (2-4)</button>
+        <button class="btn btn-danger" onclick="showScreen('main-menu')" style="margin-top: 10px;">Назад</button>
     </div>
 
+    <!-- ОФФЛАЙН ЭКРАНЫ -->
     <div id="tanks-screen" class="screen" style="justify-content: space-between; padding: 0;">
-        <div class="tank-controls p2-controls"><div class="t-pad"><div></div><div class="t-btn" ontouchstart="tInp(2,'u',1)" ontouchend="tInp(2,'u',0)">↑</div><div></div><div class="t-btn" ontouchstart="tInp(2,'l',1)" ontouchend="tInp(2,'l',0)">←</div><div class="t-btn" ontouchstart="tInp(2,'d',1)" ontouchend="tInp(2,'d',0)">↓</div><div class="t-btn" ontouchstart="tInp(2,'r',1)" ontouchend="tInp(2,'r',0)">→</div></div><div class="t-fire" ontouchstart="tShoot(2)">P2</div></div>
+        <div class="tank-controls p2-controls" id="t2-panel">
+            <div class="t-pad"><div></div><div class="t-btn" ontouchstart="tInp(2,'u',1)" ontouchend="tInp(2,'u',0)">↑</div><div></div><div class="t-btn" ontouchstart="tInp(2,'l',1)" ontouchend="tInp(2,'l',0)">←</div><div class="t-btn" ontouchstart="tInp(2,'d',1)" ontouchend="tInp(2,'d',0)">↓</div><div class="t-btn" ontouchstart="tInp(2,'r',1)" ontouchend="tInp(2,'r',0)">→</div></div>
+            <div class="t-fire" ontouchstart="tShoot(2)">P2</div>
+        </div>
         <div><h3 style="margin-bottom:5px;">Счет: <span id="tank-score" style="color:var(--pool-cyan)">0 : 0</span></h3><canvas id="tank-canvas" width="300" height="350"></canvas></div>
-        <div class="tank-controls"><div class="t-pad"><div></div><div class="t-btn" ontouchstart="tInp(1,'u',1)" ontouchend="tInp(1,'u',0)">↑</div><div></div><div class="t-btn" ontouchstart="tInp(1,'l',1)" ontouchend="tInp(1,'l',0)">←</div><div class="t-btn" ontouchstart="tInp(1,'d',1)" ontouchend="tInp(1,'d',0)">↓</div><div class="t-btn" ontouchstart="tInp(1,'r',1)" ontouchend="tInp(1,'r',0)">→</div></div><div class="t-fire" ontouchstart="tShoot(1)">P1</div></div>
+        <div class="tank-controls">
+            <div class="t-pad"><div></div><div class="t-btn" ontouchstart="tInp(1,'u',1)" ontouchend="tInp(1,'u',0)">↑</div><div></div><div class="t-btn" ontouchstart="tInp(1,'l',1)" ontouchend="tInp(1,'l',0)">←</div><div class="t-btn" ontouchstart="tInp(1,'d',1)" ontouchend="tInp(1,'d',0)">↓</div><div class="t-btn" ontouchstart="tInp(1,'r',1)" ontouchend="tInp(1,'r',0)">→</div></div>
+            <div class="t-fire" ontouchstart="tShoot(1)">P1</div>
+        </div>
         <button class="btn btn-danger" onclick="stopTanks(); showScreen('offline-menu')" style="max-width: 200px; padding: 10px; margin-bottom:10px;">Выход</button>
     </div>
 
@@ -120,7 +111,6 @@
         </div>
         <button class="btn" onclick="startAdvancedMafia()">Начать</button><button class="btn btn-danger" onclick="showScreen('offline-menu')">Назад</button>
     </div>
-
     <div id="mafia-game" class="screen">
         <h1>Тайная <span>Роль</span></h1><p>Телефон игроку <strong>№<span id="mafia-player-num" style="color:var(--pool-cyan); font-size:1.5rem;">1</span></strong></p>
         <div style="background:var(--glass); border-radius:12px; padding: 40px 20px; width:100%; max-width:320px; margin: 20px 0;"><h2 id="mafia-hidden-text">Нажми, чтобы увидеть</h2><div id="mafia-role-reveal" style="font-size: 2rem; font-weight: 900; display: none;">МАФИЯ</div></div>
@@ -141,44 +131,32 @@
         <button class="btn btn-danger" onclick="clearTimeout(rushTimeout); showScreen('offline-menu');">Выход</button>
     </div>
 
+    <!-- ОНЛАЙН -->
     <div id="online-lobby" class="screen">
         <h1>ПЛОВЦЕНТР <span>ОНЛАЙН</span></h1>
         <div style="width: 100%; max-width: 320px; text-align: left; margin-bottom: 20px;">
             <h3 style="color:var(--pool-cyan); margin-bottom: 10px;">📡 Открытые комнаты:</h3>
-            <div id="public-room-list" style="background: rgba(0,0,0,0.6); padding: 15px; border-radius: 12px; min-height: 70px; max-height: 180px; overflow-y: auto;">
-                <p style="color:gray; font-size:0.9rem;">Поиск лобби...</p>
-            </div>
+            <div id="public-room-list" style="background: rgba(0,0,0,0.6); padding: 15px; border-radius: 12px; min-height: 70px; max-height: 150px; overflow-y: auto;"><p style="color:gray; font-size:0.9rem;">Поиск лобби...</p></div>
         </div>
         <input type="text" id="player-name" placeholder="Твое имя">
-        <input type="text" id="room-id" placeholder="Код комнаты (напр. 777)">
-        <select id="game-type">
-            <option value="pingpong">🏓 Пинг-Понг</option>
-            <option value="durak">🃏 Дурак</option>
-            <option value="seabattle">🚢 Морской Бой</option>
-            <option value="checkers">🏁 Шашки</option>
-            <option value="tictactoe">✖️ Крестики-Нолики</option>
-            <option value="quiz">🧠 Квиз-Батл</option>
-        </select>
+        <input type="text" id="room-id" placeholder="Код комнаты">
+        <select id="game-type" onchange="toggleDurakSettings()"><option value="pingpong">🏓 Пинг-Понг</option><option value="durak">🃏 Дурак</option><option value="seabattle">🚢 Морской Бой</option><option value="checkers">🏁 Шашки</option><option value="tictactoe">✖️ Крестики-Нолики</option><option value="quiz">🧠 Квиз-Батл</option></select>
+        
+        <!-- Настройки Дурака (появляются только если выбран Дурак) -->
+        <select id="durak-deck-size" style="display:none; border-color:var(--gold);"><option value="36">Колода: 36 карт</option><option value="24">Колода: 24 карты</option><option value="52">Колода: 52 карты</option></select>
+        
         <button class="btn" onclick="joinOnlineRoom()">Войти / Создать</button>
         <button class="btn btn-danger" onclick="showScreen('main-menu')">Назад</button>
     </div>
 
     <div id="pingpong-screen" class="screen"><h2>Счет: <span id="pong-score" style="color:var(--pool-cyan)">0 : 0</span></h2><p style="color:gray; font-size:0.8rem; margin-bottom:10px;">Свайпай вверх-вниз</p><div id="pong-container"><div id="pong-p1" class="pong-paddle" style="left:2%; top:40%; background:var(--pool-cyan);"></div><div id="pong-p2" class="pong-paddle" style="right:2%; top:40%; background:var(--danger);"></div><div id="pong-ball"></div></div><button class="btn btn-danger" onclick="leaveOnline()" style="margin-top:20px;">Выход</button></div>
-    
     <div id="tictactoe-screen" class="screen"><h2 id="on-tic-status">Ожидание...</h2><div class="board" id="on-tic-board" style="grid-template-columns: repeat(3, 1fr);"><div class="cell" onclick="makeOnTicMove(0)"></div><div class="cell" onclick="makeOnTicMove(1)"></div><div class="cell" onclick="makeOnTicMove(2)"></div><div class="cell" onclick="makeOnTicMove(3)"></div><div class="cell" onclick="makeOnTicMove(4)"></div><div class="cell" onclick="makeOnTicMove(5)"></div><div class="cell" onclick="makeOnTicMove(6)"></div><div class="cell" onclick="makeOnTicMove(7)"></div><div class="cell" onclick="makeOnTicMove(8)"></div></div><button class="btn btn-danger" onclick="leaveOnline()">Выход</button></div>
-    
     <div id="checkers-screen" class="screen"><h2 id="chk-status">Ожидание...</h2><div class="chk-board" id="chk-board-ui"></div><button class="btn btn-danger" onclick="leaveOnline()" style="margin-top: 20px;">Выход</button></div>
-    
     <div id="seabattle-screen" class="screen"><h2>Морской Бой | <span id="sea-turn" style="color:var(--pool-cyan)">...</span></h2><div class="board" id="sea-board-ui" style="grid-template-columns: repeat(10, 1fr);"></div><button class="btn btn-danger" onclick="leaveOnline()">Выход</button></div>
-    
     <div id="quiz-screen" class="screen"><h2 id="quiz-q-text" style="margin-bottom:20px;">Ждем...</h2><div id="quiz-options" style="display:flex; flex-direction:column; width:100%; max-width:320px; gap:10px;"></div><h3 style="margin-top:20px;">Счет: <span id="quiz-my-score" style="color:var(--success)">0</span></h3><button class="btn btn-danger" onclick="leaveOnline()" style="margin-top:20px;">Выход</button></div>
-    
     <div id="durak-screen" class="screen" style="justify-content: flex-start; padding-top:10px;">
         <div style="width: 100%; max-width: 400px; display:flex; flex-direction:column; height:85vh;">
-            <div style="display: flex; justify-content: space-between; align-items: center; color: gray;">
-                <div style="text-align: left;">Колода: <span id="cards-left" style="color:white;">36</span><br>Враг: <span id="opp-cards" style="color:var(--danger);">0</span> шт.</div>
-                <div style="display: flex; align-items: center;">Козырь:<div id="trump-display" class="card" style="transform: rotate(90deg); margin-left: 10px; width: 40px; height: 60px; font-size: 0.9rem;"></div></div>
-            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; color: gray;"><div style="text-align: left;">Колода: <span id="cards-left" style="color:white;">36</span><br>Враг: <span id="opp-cards" style="color:var(--danger);">0</span> шт.</div><div style="display: flex; align-items: center;">Козырь:<div id="trump-display" class="card" style="transform: rotate(90deg); margin-left: 10px; width: 40px; height: 60px; font-size: 0.9rem;"></div></div></div>
             <div style="flex-grow: 1; border: 1px dashed rgba(0, 243, 255, 0.3); border-radius: 12px; margin: 15px 0; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 10px; padding: 10px;" id="durak-table"></div>
             <div style="display:flex; gap:10px; justify-content:center; margin-bottom:10px;" id="durak-controls" style="display:none;"><button class="btn btn-danger" style="margin:0; padding:12px;" onclick="socket.emit('durak_take', currentRoom)">Беру</button><button class="btn" style="margin:0; padding:12px;" onclick="socket.emit('durak_bito', currentRoom)">Бито</button></div>
             <div class="hand" id="my-hand"></div>
@@ -189,21 +167,21 @@
     <script>
         function showScreen(id) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); window.scrollTo(0, 0); }
 
-        // --- УМНАЯ МАФИЯ ---
+        function toggleDurakSettings() {
+            const gt = document.getElementById('game-type').value;
+            document.getElementById('durak-deck-size').style.display = gt === 'durak' ? 'block' : 'none';
+        }
+
+        // ================= ОФФЛАЙН: МАФИЯ =================
         let mafiaRoles = [], currentMafiaIndex = 0;
         function calcMafia() {
-            let total = parseInt(document.getElementById('m-total').value) || 0;
-            let m = parseInt(document.getElementById('m-maf').value) || 0;
-            let d = parseInt(document.getElementById('m-doc').value) || 0;
-            let s = parseInt(document.getElementById('m-sher').value) || 0;
-            let civs = total - (m + d + s);
-            const civsEl = document.getElementById('m-civs');
-            if (civs < 0) { civsEl.innerText = "ОШИБКА! Ролей больше людей!"; civsEl.style.color = "var(--danger)"; } 
-            else { civsEl.innerText = civs; civsEl.style.color = "white"; }
+            let t = parseInt(document.getElementById('m-total').value)||0, m = parseInt(document.getElementById('m-maf').value)||0, d = parseInt(document.getElementById('m-doc').value)||0, s = parseInt(document.getElementById('m-sher').value)||0;
+            let civs = t - (m + d + s);
+            document.getElementById('m-civs').innerText = civs < 0 ? "ОШИБКА!" : civs; document.getElementById('m-civs').style.color = civs < 0 ? "var(--danger)" : "white";
             return civs;
         }
         function startAdvancedMafia() {
-            let civs = calcMafia(); if (civs < 0) return alert("ОШИБКА: Уменьшите роли или добавьте людей!");
+            let civs = calcMafia(); if (civs < 0) return alert("ОШИБКА: Мало людей!");
             mafiaRoles = [];
             for(let i=0; i<parseInt(document.getElementById('m-maf').value); i++) mafiaRoles.push('МАФИОЗИ 🔫');
             for(let i=0; i<parseInt(document.getElementById('m-doc').value); i++) mafiaRoles.push('ДОКТОР 💊');
@@ -213,65 +191,81 @@
             document.getElementById('mafia-player-num').innerText = 1; document.getElementById('mafia-hidden-text').style.display = 'block'; document.getElementById('mafia-role-reveal').style.display = 'none'; document.getElementById('btn-show-role').style.display = 'block'; document.getElementById('btn-next-role').style.display = 'none';
             showScreen('mafia-game');
         }
-        function showMafiaRole() {
-            document.getElementById('mafia-hidden-text').style.display = 'none'; let r = mafiaRoles[currentMafiaIndex]; let el = document.getElementById('mafia-role-reveal');
-            el.innerText = r; el.style.display = 'block'; el.style.color = r.includes('МАФИ') ? 'var(--danger)' : r.includes('ДОК') ? 'var(--success)' : r.includes('ШЕР') ? 'var(--pool-cyan)' : 'white';
-            document.getElementById('btn-show-role').style.display = 'none'; document.getElementById('btn-next-role').style.display = 'block';
-        }
-        function nextMafiaRole() {
-            currentMafiaIndex++;
-            if(currentMafiaIndex >= mafiaRoles.length) { alert("Город засыпает..."); showScreen('offline-menu'); } 
-            else { document.getElementById('mafia-player-num').innerText = currentMafiaIndex + 1; document.getElementById('mafia-hidden-text').style.display = 'block'; document.getElementById('mafia-role-reveal').style.display = 'none'; document.getElementById('btn-show-role').style.display = 'block'; document.getElementById('btn-next-role').style.display = 'none'; }
-        }
+        function showMafiaRole() { document.getElementById('mafia-hidden-text').style.display = 'none'; let r = mafiaRoles[currentMafiaIndex]; let el = document.getElementById('mafia-role-reveal'); el.innerText = r; el.style.display = 'block'; el.style.color = r.includes('МАФИ') ? 'var(--danger)' : r.includes('ДОК') ? 'var(--success)' : r.includes('ШЕР') ? 'var(--pool-cyan)' : 'white'; document.getElementById('btn-show-role').style.display = 'none'; document.getElementById('btn-next-role').style.display = 'block'; }
+        function nextMafiaRole() { currentMafiaIndex++; if(currentMafiaIndex >= mafiaRoles.length) { alert("Город засыпает..."); showScreen('offline-menu'); } else { document.getElementById('mafia-player-num').innerText = currentMafiaIndex + 1; document.getElementById('mafia-hidden-text').style.display = 'block'; document.getElementById('mafia-role-reveal').style.display = 'none'; document.getElementById('btn-show-role').style.display = 'block'; document.getElementById('btn-next-role').style.display = 'none'; } }
 
-        // --- ОФФЛАЙН: ТАНКИ 2D ---
+        // ================= ОФФЛАЙН: ЛИХОРАДКА =================
+        let rushScores = [0,0,0,0], rushActive = false, rushTimeout;
+        function startRush() { rushScores = [0,0,0,0]; updateRushScores(); nextRushRound(); }
+        function nextRushRound() { rushActive = false; document.getElementById('rush-center').innerText = "⏳"; rushTimeout = setTimeout(() => { document.getElementById('rush-center').innerText = "💎"; rushActive = true; }, Math.random() * 3000 + 1500); }
+        function rushTap(pIdx) { if (!rushActive) return; rushActive = false; clearTimeout(rushTimeout); rushScores[pIdx]++; updateRushScores(); if (rushScores[pIdx] >= 5) { document.getElementById('rush-center').innerText = `P${pIdx+1} ВИН!`; setTimeout(startRush, 3000); } else { document.getElementById('rush-center').innerText = "🔥"; setTimeout(nextRushRound, 1500); } }
+        function updateRushScores() { for(let i=0; i<4; i++) document.getElementById(`r-score-${i+1}`).innerText = rushScores[i]; }
+
+        // ================= ОФФЛАЙН: ТАНКИ + УМНЫЙ ИИ =================
         const cvs = document.getElementById('tank-canvas'); const ctx = cvs.getContext('2d');
-        let tLoop, t1, t2, bullets = [], tScore = [0,0];
+        let tLoop, t1, t2, bullets = [], tScore = [0,0], isTankBot = false;
         const keys = { 1:{u:0,d:0,l:0,r:0}, 2:{u:0,d:0,l:0,r:0} };
-        function tInp(p, dir, state) { keys[p][dir] = state; }
+        function tInp(p, dir, state) { if(p===2 && isTankBot) return; keys[p][dir] = state; }
+        
         function initTanks() {
-            t1 = { x: 150, y: 300, a: -Math.PI/2, speed: 2.5, color: '#00f3ff' }; t2 = { x: 150, y: 50, a: Math.PI/2, speed: 2.5, color: '#ff0055' };
+            isTankBot = document.getElementById('tank-mode').value === 'bot';
+            document.getElementById('t2-panel').style.opacity = isTankBot ? '0.2' : '1'; // Прячем кнопки бота
+            t1 = { x: 150, y: 300, a: -Math.PI/2, speed: 2.5, color: '#00f3ff', cd: 0 }; 
+            t2 = { x: 150, y: 50, a: Math.PI/2, speed: 2.5, color: '#ff0055', cd: 0 };
             bullets = []; if(!tLoop) tLoop = requestAnimationFrame(updateTanks);
         }
-        function tShoot(p) { let t = p === 1 ? t1 : t2; bullets.push({ x: t.x + Math.cos(t.a)*15, y: t.y + Math.sin(t.a)*15, vx: Math.cos(t.a)*6, vy: Math.sin(t.a)*6, owner: p }); }
+        function tShoot(p) { let t = p === 1 ? t1 : t2; if(t.cd > 0) return; t.cd = 20; bullets.push({ x: t.x + Math.cos(t.a)*15, y: t.y + Math.sin(t.a)*15, vx: Math.cos(t.a)*6, vy: Math.sin(t.a)*6, owner: p }); }
+        
         function updateTanks() {
-            if(document.getElementById('tanks-screen').classList.contains('active')) {
-                ctx.clearRect(0, 0, cvs.width, cvs.height);
-                if(keys[1].l) t1.a -= 0.08; if(keys[1].r) t1.a += 0.08;
-                if(keys[1].u) { t1.x += Math.cos(t1.a)*t1.speed; t1.y += Math.sin(t1.a)*t1.speed; } if(keys[1].d) { t1.x -= Math.cos(t1.a)*t1.speed; t1.y -= Math.sin(t1.a)*t1.speed; }
-                if(keys[2].l) t2.a -= 0.08; if(keys[2].r) t2.a += 0.08;
-                if(keys[2].u) { t2.x += Math.cos(t2.a)*t2.speed; t2.y += Math.sin(t2.a)*t2.speed; } if(keys[2].d) { t2.x -= Math.cos(t2.a)*t2.speed; t2.y -= Math.sin(t2.a)*t2.speed; }
-                [t1, t2].forEach(t => { if(t.x<12) t.x=12; if(t.x>cvs.width-12) t.x=cvs.width-12; if(t.y<12) t.y=12; if(t.y>cvs.height-12) t.y=cvs.height-12; });
-                drawTank(t1); drawTank(t2);
-                for(let i = bullets.length-1; i >= 0; i--) {
-                    let b = bullets[i]; b.x += b.vx; b.y += b.vy;
-                    ctx.fillStyle = 'yellow'; ctx.beginPath(); ctx.arc(b.x, b.y, 3, 0, Math.PI*2); ctx.fill();
-                    let hit1 = Math.hypot(b.x - t1.x, b.y - t1.y) < 18; let hit2 = Math.hypot(b.x - t2.x, b.y - t2.y) < 18;
-                    if(hit1 && b.owner === 2) { tScore[1]++; document.getElementById('tank-score').innerText = `${tScore[0]} : ${tScore[1]}`; initTanks(); break; }
-                    if(hit2 && b.owner === 1) { tScore[0]++; document.getElementById('tank-score').innerText = `${tScore[0]} : ${tScore[1]}`; initTanks(); break; }
-                    if(b.x<0 || b.x>cvs.width || b.y<0 || b.y>cvs.height) bullets.splice(i, 1);
-                }
-                tLoop = requestAnimationFrame(updateTanks);
+            if(!document.getElementById('tanks-screen').classList.contains('active')) return;
+            ctx.clearRect(0, 0, cvs.width, cvs.height);
+            if(t1.cd > 0) t1.cd--; if(t2.cd > 0) t2.cd--;
+
+            // ИИ БОТА (Танк 2)
+            if(isTankBot) {
+                keys[2] = {u:0, d:0, l:0, r:0}; // Сброс
+                let dx = t1.x - t2.x; let dy = t1.y - t2.y;
+                let targetAngle = Math.atan2(dy, dx);
+                let angleDiff = targetAngle - t2.a;
+                // Нормализация угла
+                while(angleDiff <= -Math.PI) angleDiff += Math.PI*2;
+                while(angleDiff > Math.PI) angleDiff -= Math.PI*2;
+
+                if (Math.abs(angleDiff) > 0.1) { if(angleDiff > 0) keys[2].r = 1; else keys[2].l = 1; }
+                let dist = Math.hypot(dx, dy);
+                if (dist > 100) keys[2].u = 1; // Ехать к игроку
+                if (Math.abs(angleDiff) < 0.2 && dist < 250 && Math.random() < 0.05) tShoot(2); // Стрелять
             }
+
+            // Движение
+            if(keys[1].l) t1.a -= 0.08; if(keys[1].r) t1.a += 0.08;
+            if(keys[1].u) { t1.x += Math.cos(t1.a)*t1.speed; t1.y += Math.sin(t1.a)*t1.speed; } if(keys[1].d) { t1.x -= Math.cos(t1.a)*t1.speed; t1.y -= Math.sin(t1.a)*t1.speed; }
+            if(keys[2].l) t2.a -= 0.08; if(keys[2].r) t2.a += 0.08;
+            if(keys[2].u) { t2.x += Math.cos(t2.a)*t2.speed; t2.y += Math.sin(t2.a)*t2.speed; } if(keys[2].d) { t2.x -= Math.cos(t2.a)*t2.speed; t2.y -= Math.sin(t2.a)*t2.speed; }
+            [t1, t2].forEach(t => { if(t.x<12) t.x=12; if(t.x>cvs.width-12) t.x=cvs.width-12; if(t.y<12) t.y=12; if(t.y>cvs.height-12) t.y=cvs.height-12; });
+            
+            drawTank(t1); drawTank(t2);
+
+            // Пули
+            for(let i = bullets.length-1; i >= 0; i--) {
+                let b = bullets[i]; b.x += b.vx; b.y += b.vy;
+                ctx.fillStyle = 'yellow'; ctx.beginPath(); ctx.arc(b.x, b.y, 3, 0, Math.PI*2); ctx.fill();
+                if(Math.hypot(b.x - t1.x, b.y - t1.y) < 18 && b.owner === 2) { tScore[1]++; document.getElementById('tank-score').innerText = `${tScore[0]} : ${tScore[1]}`; initTanks(); break; }
+                if(Math.hypot(b.x - t2.x, b.y - t2.y) < 18 && b.owner === 1) { tScore[0]++; document.getElementById('tank-score').innerText = `${tScore[0]} : ${tScore[1]}`; initTanks(); break; }
+                if(b.x<0 || b.x>cvs.width || b.y<0 || b.y>cvs.height) bullets.splice(i, 1);
+            }
+            tLoop = requestAnimationFrame(updateTanks);
         }
         function drawTank(t) { ctx.save(); ctx.translate(t.x, t.y); ctx.rotate(t.a); ctx.fillStyle = t.color; ctx.fillRect(-12, -12, 24, 24); ctx.fillStyle = 'white'; ctx.fillRect(0, -3, 18, 6); ctx.restore(); }
         function stopTanks() { cancelAnimationFrame(tLoop); tLoop = null; tScore = [0,0]; document.getElementById('tank-score').innerText = "0 : 0"; }
 
-        // --- ОФФЛАЙН: АЛМАЗНАЯ ЛИХОРАДКА ---
-        let rushScores = [0,0,0,0], rushActive = false, rushTimeout;
-        function startRush() { rushScores = [0,0,0,0]; updateRushScores(); nextRushRound(); }
-        function nextRushRound() { rushActive = false; document.getElementById('rush-center').innerText = "⏳"; rushTimeout = setTimeout(() => { document.getElementById('rush-center').innerText = "💎"; rushActive = true; }, Math.random() * 3000 + 1500); }
-        function rushTap(pIdx) {
-            if (!rushActive) return;
-            rushActive = false; clearTimeout(rushTimeout); rushScores[pIdx]++; updateRushScores();
-            if (rushScores[pIdx] >= 5) { document.getElementById('rush-center').innerText = `P${pIdx+1} ВИН!`; setTimeout(startRush, 3000); } 
-            else { document.getElementById('rush-center').innerText = "🔥"; setTimeout(nextRushRound, 1500); }
+        // ================= ОФФЛАЙН: ШАШКИ + БОТ =================
+        let offChkBoard = [], offChkTurn = 1, offChkSelected = null, isChkBot = false;
+        function startOffChk() { 
+            isChkBot = document.getElementById('chk-mode').value === 'bot';
+            offChkBoard = [0,2,0,2,0,2,0,2, 2,0,2,0,2,0,2,0, 0,2,0,2,0,2,0,2, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 1,0,1,0,1,0,1,0, 0,1,0,1,0,1,0,1, 1,0,1,0,1,0,1,0]; 
+            offChkTurn = 1; offChkSelected = null; renderOffChk(); 
         }
-        function updateRushScores() { for(let i=0; i<4; i++) document.getElementById(`r-score-${i+1}`).innerText = rushScores[i]; }
-
-        // --- ОФФЛАЙН ШАШКИ ---
-        let offChkBoard = [], offChkTurn = 1, offChkSelected = null;
-        function startOffChk() { offChkBoard = [0,2,0,2,0,2,0,2, 2,0,2,0,2,0,2,0, 0,2,0,2,0,2,0,2, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 1,0,1,0,1,0,1,0, 0,1,0,1,0,1,0,1, 1,0,1,0,1,0,1,0]; offChkTurn = 1; offChkSelected = null; renderOffChk(); }
         function renderOffChk() {
             const bUi = document.getElementById('off-chk-board-ui'); bUi.innerHTML = '';
             offChkBoard.forEach((val, i) => {
@@ -280,13 +274,44 @@
                 if (val === 2) c += `<div class="chk-piece p2 ${offChkSelected === i ? 'selected' : ''}"></div>`;
                 bUi.innerHTML += c + `</div>`;
             });
-            document.getElementById('off-chk-status').innerText = offChkTurn === 1 ? "Ход Синих (X)" : "Ход Красных (O)"; document.getElementById('off-chk-status').style.color = offChkTurn === 1 ? "var(--pool-cyan)" : "var(--danger)";
+            document.getElementById('off-chk-status').innerText = offChkTurn === 1 ? "Твой Ход (Синие)" : (isChkBot ? "Бот думает..." : "Ход Красных");
+            document.getElementById('off-chk-status').style.color = offChkTurn === 1 ? "var(--pool-cyan)" : "var(--danger)";
         }
-        function offChkClick(index) { if (offChkSelected === null) { if (offChkBoard[index] === offChkTurn) { offChkSelected = index; renderOffChk(); } } else { if (offChkBoard[index] === 0) { offChkBoard[index] = offChkTurn; offChkBoard[offChkSelected] = 0; offChkTurn = offChkTurn === 1 ? 2 : 1; } offChkSelected = null; renderOffChk(); } }
+        function offChkClick(index) {
+            if(isChkBot && offChkTurn === 2) return; // Игрок не может ходить за бота
+            if (offChkSelected === null) { if (offChkBoard[index] === offChkTurn) { offChkSelected = index; renderOffChk(); } } 
+            else { 
+                if (offChkBoard[index] === 0) { 
+                    // Простая проверка хода (для оффлайна без строгих правил рубки для экономии места)
+                    offChkBoard[index] = offChkTurn; offChkBoard[offChkSelected] = 0; 
+                    offChkTurn = offChkTurn === 1 ? 2 : 1; 
+                    if(isChkBot && offChkTurn === 2) setTimeout(makeChkBotMove, 800);
+                } 
+                offChkSelected = null; renderOffChk(); 
+            }
+        }
+        // Простой ИИ Бота для шашек (выбирает случайную свою шашку и делает ход вперед)
+        function makeChkBotMove() {
+            let pieces = [];
+            for(let i=0; i<64; i++) if(offChkBoard[i] === 2) pieces.push(i);
+            pieces.sort(() => Math.random() - 0.5); // Случайный порядок
+            let moved = false;
+            for(let p of pieces) {
+                let r = Math.floor(p/8), c = p%8;
+                let moves = [p+7, p+9]; // Вперед для красных (вниз доски)
+                for(let m of moves) {
+                    if(m>=0 && m<64 && offChkBoard[m] === 0 && Math.abs((m%8)-c) === 1) {
+                        offChkBoard[m] = 2; offChkBoard[p] = 0; moved = true; break;
+                    }
+                }
+                if(moved) break;
+            }
+            offChkTurn = 1; renderOffChk();
+        }
 
-        // --- ОНЛАЙН ЛОГИКА ---
+        // ================= ОНЛАЙН СОКЕТЫ =================
         const socket = io();
-        let currentRoom = "", currentGame = "", mySymbol = "", selectedChk = null;
+        let currentRoom = "", currentGame = ""; mySymbol = "", selectedChk = null;
         const gameNames = { 'durak': 'Дурак', 'pingpong': 'Пинг-Понг', 'checkers': 'Шашки', 'seabattle': 'Морской Бой', 'quiz': 'Квиз', 'tictactoe': 'Крестики' };
 
         socket.on('update_room_list', (rooms) => {
@@ -297,6 +322,7 @@
 
         function joinOnlineRoom() {
             const name = document.getElementById('player-name').value.trim(); currentRoom = document.getElementById('room-id').value.trim(); currentGame = document.getElementById('game-type').value;
+            const dSize = parseInt(document.getElementById('durak-deck-size').value) || 36;
             if (!name || !currentRoom) return alert("Введите имя и код!");
             if(currentGame === 'tictactoe') showScreen('tictactoe-screen');
             if(currentGame === 'durak') showScreen('durak-screen');
@@ -304,17 +330,17 @@
             if(currentGame === 'seabattle') showScreen('seabattle-screen');
             if(currentGame === 'quiz') showScreen('quiz-screen');
             if(currentGame === 'pingpong') showScreen('pingpong-screen');
-            socket.emit('join_room', { roomId: currentRoom, playerName: name, gameType: currentGame });
+            
+            // Передаем размер колоды на сервер
+            socket.emit('join_room', { roomId: currentRoom, playerName: name, gameType: currentGame, durakDeckSize: dSize });
         }
         function leaveOnline() { window.location.reload(); }
         socket.on('assigned_symbol', (symbol) => { mySymbol = symbol; });
 
-        // Пинг-Понг Управление
         const pongBox = document.getElementById('pong-container');
         pongBox.addEventListener('touchmove', (e) => { e.preventDefault(); let rect = pongBox.getBoundingClientRect(); let y = ((e.touches[0].clientY - rect.top) / rect.height) * 100; y = Math.max(0, Math.min(80, y - 10)); socket.emit('pong_move', { roomId: currentRoom, y: y, symbol: mySymbol }); });
         socket.on('update_pong', (p) => { document.getElementById('pong-score').innerText = `${p.s1} : ${p.s2}`; document.getElementById('pong-p1').style.top = p.p1Y + '%'; document.getElementById('pong-p2').style.top = p.p2Y + '%'; document.getElementById('pong-ball').style.left = p.bX + '%'; document.getElementById('pong-ball').style.top = p.bY + '%'; });
 
-        // Общий рендер Игр
         socket.on('update_game', (data) => {
             if (data.gameType === 'tictactoe') {
                 const cells = document.getElementById('on-tic-board').children;
