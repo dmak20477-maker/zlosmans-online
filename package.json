@@ -1,7 +1,7 @@
 {
-  "name": "zlosmans-online",
+  "name": "plovcenter-hub",
   "version": "1.0.0",
-  "description": "ZLOSMANS Multiplayer Hub",
+  "description": "Ультимативный игровой хаб ПЛОВЦЕНТР",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
@@ -9,5 +9,10 @@
   "dependencies": {
     "express": "^4.18.2",
     "socket.io": "^4.7.2"
-  }
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "author": "Денис Максатбеков))",
+  "license": "MIT"
 }
