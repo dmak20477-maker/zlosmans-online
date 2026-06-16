@@ -39,10 +39,10 @@
         .card.red { color: var(--danger); border-color: rgba(255,0,85,0.3); }
         .hand { display: flex; justify-content: center; flex-wrap: wrap; gap: 5px; margin-top: 10px; }
 
-        #tank-canvas { background: #08080a; border: 2px solid var(--success); border-radius: 12px; max-width: 100%; image-rendering: pixelated; }
-        .tank-controls { width: 100%; max-width: 340px; display: flex; justify-content: space-between; padding: 10px; }
+        /* УВЕЛИЧЕННАЯ КАРТА ТАНКОВ */
+        #tank-canvas { background: #08080a; border: 2px solid var(--success); border-radius: 12px; width: 100%; max-width: 340px; max-height: 55vh; object-fit: contain; image-rendering: pixelated; box-shadow: inset 0 0 30px rgba(0,255,100,0.1); }
+        .tank-controls { width: 100%; max-width: 340px; display: flex; justify-content: space-between; padding: 5px 10px; }
         .t-pad { display: grid; grid-template-columns: repeat(3, 45px); gap: 5px; }
-        /* ЖЕСТКАЯ БЛОКИРОВКА ЭКРАНА НА КНОПКАХ ТАНКОВ */
         .t-btn, .t-fire { touch-action: none; user-select: none; cursor: pointer; display: flex; justify-content: center; align-items: center; font-weight: 900; color: white; }
         .t-btn { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); height: 45px; border-radius: 8px; font-size: 1.5rem; }
         .t-btn:active { background: white; color: black; }
@@ -56,7 +56,7 @@
     </style>
 </head>
 <body>
-    <div class="author-tag">Автор: Денис Максатбеков)) | @prodelal</div>
+    <div class="author-tag">Автор: Денис | @ekx888d</div>
 
     <div id="main-menu" class="screen active">
         <h1>ПЛОВЦЕНТР <span>HUB</span></h1>
@@ -64,10 +64,11 @@
         <button class="btn" onclick="showScreen('online-lobby')">🌐 ОНЛАЙН (Сетевая)</button>
     </div>
 
+    <!-- ОФФЛАЙН -->
     <div id="offline-menu" class="screen">
         <h1>ОФФЛАЙН <span>ИГРЫ</span></h1>
         <div style="background:var(--glass); padding:10px; border-radius:10px; margin-bottom:10px; width:100%; max-width:320px;">
-            <p style="color:var(--success); margin-bottom:5px; font-weight:bold;">💥 ТАНКИ 2D</p>
+            <p style="color:var(--success); margin-bottom:5px; font-weight:bold;">💥 ТАНКИ 2D (С ПРЕГРАДАМИ)</p>
             <select id="tank-mode" style="margin-bottom:5px;"><option value="pvp">С другом (PVP)</option><option value="bot">С Ботом (ИИ)</option></select>
             <button class="btn btn-success" style="border-color:var(--success); color:var(--success);" onclick="showScreen('tanks-screen'); initTanks();">ИГРАТЬ</button>
         </div>
@@ -86,7 +87,8 @@
             <div class="t-pad"><div></div><div class="t-btn" onpointerdown="tInp(2,'u',1)" onpointerup="tInp(2,'u',0)" onpointerleave="tInp(2,'u',0)" oncontextmenu="return false;">↑</div><div></div><div class="t-btn" onpointerdown="tInp(2,'l',1)" onpointerup="tInp(2,'l',0)" onpointerleave="tInp(2,'l',0)" oncontextmenu="return false;">←</div><div class="t-btn" onpointerdown="tInp(2,'d',1)" onpointerup="tInp(2,'d',0)" onpointerleave="tInp(2,'d',0)" oncontextmenu="return false;">↓</div><div class="t-btn" onpointerdown="tInp(2,'r',1)" onpointerup="tInp(2,'r',0)" onpointerleave="tInp(2,'r',0)" oncontextmenu="return false;">→</div></div>
             <div class="t-fire" onpointerdown="tShoot(2)" oncontextmenu="return false;">P2</div>
         </div>
-        <div><h3 style="margin-bottom:5px;">Счет: <span id="tank-score" style="color:var(--pool-cyan)">0 : 0</span></h3><canvas id="tank-canvas" width="300" height="350"></canvas></div>
+        <!-- РАЗМЕР ХОЛСТА УВЕЛИЧЕН -->
+        <div><h3 style="margin-bottom:5px;">Счет: <span id="tank-score" style="color:var(--pool-cyan)">0 : 0</span></h3><canvas id="tank-canvas" width="340" height="460"></canvas></div>
         <div class="tank-controls">
             <div class="t-pad"><div></div><div class="t-btn" onpointerdown="tInp(1,'u',1)" onpointerup="tInp(1,'u',0)" onpointerleave="tInp(1,'u',0)" oncontextmenu="return false;">↑</div><div></div><div class="t-btn" onpointerdown="tInp(1,'l',1)" onpointerup="tInp(1,'l',0)" onpointerleave="tInp(1,'l',0)" oncontextmenu="return false;">←</div><div class="t-btn" onpointerdown="tInp(1,'d',1)" onpointerup="tInp(1,'d',0)" onpointerleave="tInp(1,'d',0)" oncontextmenu="return false;">↓</div><div class="t-btn" onpointerdown="tInp(1,'r',1)" onpointerup="tInp(1,'r',0)" onpointerleave="tInp(1,'r',0)" oncontextmenu="return false;">→</div></div>
             <div class="t-fire" onpointerdown="tShoot(1)" oncontextmenu="return false;">P1</div>
@@ -125,6 +127,7 @@
         <button class="btn btn-danger" onclick="clearTimeout(rushTimeout); showScreen('offline-menu');">Выход</button>
     </div>
 
+    <!-- ОНЛАЙН -->
     <div id="online-lobby" class="screen">
         <h1>ПЛОВЦЕНТР <span>ОНЛАЙН</span></h1>
         <div style="width: 100%; max-width: 320px; text-align: left; margin-bottom: 20px;">
@@ -160,23 +163,8 @@
 
         // --- МАФИЯ ---
         let mafiaRoles = [], currentMafiaIndex = 0;
-        function calcMafia() {
-            let t = parseInt(document.getElementById('m-total').value)||0, m = parseInt(document.getElementById('m-maf').value)||0, d = parseInt(document.getElementById('m-doc').value)||0, s = parseInt(document.getElementById('m-sher').value)||0;
-            let civs = t - (m + d + s);
-            document.getElementById('m-civs').innerText = civs < 0 ? "ОШИБКА!" : civs; document.getElementById('m-civs').style.color = civs < 0 ? "var(--danger)" : "white";
-            return civs;
-        }
-        function startAdvancedMafia() {
-            let civs = calcMafia(); if (civs < 0) return alert("ОШИБКА: Мало людей!");
-            mafiaRoles = [];
-            for(let i=0; i<parseInt(document.getElementById('m-maf').value); i++) mafiaRoles.push('МАФИОЗИ 🔫');
-            for(let i=0; i<parseInt(document.getElementById('m-doc').value); i++) mafiaRoles.push('ДОКТОР 💊');
-            for(let i=0; i<parseInt(document.getElementById('m-sher').value); i++) mafiaRoles.push('ШЕРИФ 👮‍♂️');
-            for(let i=0; i<civs; i++) mafiaRoles.push('МИРНЫЙ ЖИТЕЛЬ 🧑‍🌾');
-            mafiaRoles.sort(() => Math.random() - 0.5); currentMafiaIndex = 0;
-            document.getElementById('mafia-player-num').innerText = 1; document.getElementById('mafia-hidden-text').style.display = 'block'; document.getElementById('mafia-role-reveal').style.display = 'none'; document.getElementById('btn-show-role').style.display = 'block'; document.getElementById('btn-next-role').style.display = 'none';
-            showScreen('mafia-game');
-        }
+        function calcMafia() { let t = parseInt(document.getElementById('m-total').value)||0, m = parseInt(document.getElementById('m-maf').value)||0, d = parseInt(document.getElementById('m-doc').value)||0, s = parseInt(document.getElementById('m-sher').value)||0; let civs = t - (m + d + s); document.getElementById('m-civs').innerText = civs < 0 ? "ОШИБКА!" : civs; document.getElementById('m-civs').style.color = civs < 0 ? "var(--danger)" : "white"; return civs; }
+        function startAdvancedMafia() { let civs = calcMafia(); if (civs < 0) return alert("ОШИБКА: Мало людей!"); mafiaRoles = []; for(let i=0; i<parseInt(document.getElementById('m-maf').value); i++) mafiaRoles.push('МАФИОЗИ 🔫'); for(let i=0; i<parseInt(document.getElementById('m-doc').value); i++) mafiaRoles.push('ДОКТОР 💊'); for(let i=0; i<parseInt(document.getElementById('m-sher').value); i++) mafiaRoles.push('ШЕРИФ 👮‍♂️'); for(let i=0; i<civs; i++) mafiaRoles.push('МИРНЫЙ ЖИТЕЛЬ 🧑‍🌾'); mafiaRoles.sort(() => Math.random() - 0.5); currentMafiaIndex = 0; document.getElementById('mafia-player-num').innerText = 1; document.getElementById('mafia-hidden-text').style.display = 'block'; document.getElementById('mafia-role-reveal').style.display = 'none'; document.getElementById('btn-show-role').style.display = 'block'; document.getElementById('btn-next-role').style.display = 'none'; showScreen('mafia-game'); }
         function showMafiaRole() { document.getElementById('mafia-hidden-text').style.display = 'none'; let r = mafiaRoles[currentMafiaIndex]; let el = document.getElementById('mafia-role-reveal'); el.innerText = r; el.style.display = 'block'; el.style.color = r.includes('МАФИ') ? 'var(--danger)' : r.includes('ДОК') ? 'var(--success)' : r.includes('ШЕР') ? 'var(--pool-cyan)' : 'white'; document.getElementById('btn-show-role').style.display = 'none'; document.getElementById('btn-next-role').style.display = 'block'; }
         function nextMafiaRole() { currentMafiaIndex++; if(currentMafiaIndex >= mafiaRoles.length) { alert("Город засыпает..."); showScreen('offline-menu'); } else { document.getElementById('mafia-player-num').innerText = currentMafiaIndex + 1; document.getElementById('mafia-hidden-text').style.display = 'block'; document.getElementById('mafia-role-reveal').style.display = 'none'; document.getElementById('btn-show-role').style.display = 'block'; document.getElementById('btn-next-role').style.display = 'none'; } }
 
@@ -187,27 +175,50 @@
         function rushTap(pIdx) { if (!rushActive) return; rushActive = false; clearTimeout(rushTimeout); rushScores[pIdx]++; updateRushScores(); if (rushScores[pIdx] >= 5) { document.getElementById('rush-center').innerText = `P${pIdx+1} ВИН!`; setTimeout(startRush, 3000); } else { document.getElementById('rush-center').innerText = "🔥"; setTimeout(nextRushRound, 1500); } }
         function updateRushScores() { for(let i=0; i<4; i++) document.getElementById(`r-score-${i+1}`).innerText = rushScores[i]; }
 
-        // --- ТАНКИ 2D (УМНЫЙ БОТ + onpointerdown) ---
+        // --- ТАНКИ 2D (ПРЕГРАДЫ, КУЛДАУН И УМНЫЙ ИИ) ---
         const cvs = document.getElementById('tank-canvas'); const ctx = cvs.getContext('2d');
         let tLoop, t1, t2, bullets = [], tScore = [0,0], isTankBot = false;
         const keys = { 1:{u:0,d:0,l:0,r:0}, 2:{u:0,d:0,l:0,r:0} };
         function tInp(p, dir, state) { if(p===2 && isTankBot) return; keys[p][dir] = state; }
+
+        // МАССИВ БЕТОННЫХ ПРЕГРАД
+        const walls = [
+            {x: 40, y: 120, w: 80, h: 25}, {x: 220, y: 120, w: 80, h: 25}, // Верхние стены
+            {x: 40, y: 315, w: 80, h: 25}, {x: 220, y: 315, w: 80, h: 25}, // Нижние стены
+            {x: 130, y: 195, w: 80, h: 70} // Центральный бункер
+        ];
+
+        // ФУНКЦИЯ ПРОВЕРКИ СТОЛКНОВЕНИЯ СО СТЕНОЙ
+        function collideWall(x, y, isBullet) {
+            let s = isBullet ? 2 : 12; // Радиус танка 12, пули 2
+            for(let w of walls) {
+                if(x+s > w.x && x-s < w.x+w.w && y+s > w.y && y-s < w.y+w.h) return true;
+            }
+            return false;
+        }
         
         function initTanks() {
             isTankBot = document.getElementById('tank-mode').value === 'bot';
             document.getElementById('t2-panel').style.opacity = isTankBot ? '0.2' : '1'; 
-            t1 = { x: 150, y: 300, a: -Math.PI/2, speed: 2.8, color: '#00f3ff', cd: 0 }; 
-            t2 = { x: 150, y: 50, a: Math.PI/2, speed: 2.8, color: '#ff0055', cd: 0 };
+            // Спавн с учетом преград
+            t1 = { x: 170, y: 430, a: -Math.PI/2, speed: 2.8, color: '#00f3ff', lastShot: 0 }; 
+            t2 = { x: 170, y: 30, a: Math.PI/2, speed: 2.8, color: '#ff0055', lastShot: 0 };
             bullets = []; if(!tLoop) tLoop = requestAnimationFrame(updateTanks);
         }
-        function tShoot(p) { let t = p === 1 ? t1 : t2; if(t.cd > 0) return; t.cd = 20; bullets.push({ x: t.x + Math.cos(t.a)*15, y: t.y + Math.sin(t.a)*15, vx: Math.cos(t.a)*6, vy: Math.sin(t.a)*6, owner: p }); }
+
+        function tShoot(p) { 
+            let t = p === 1 ? t1 : t2; 
+            let now = Date.now();
+            if(now - t.lastShot < 800) return; // СТРОГИЙ ЛИМИТ: 0.8 сек между выстрелами
+            t.lastShot = now; 
+            bullets.push({ x: t.x + Math.cos(t.a)*16, y: t.y + Math.sin(t.a)*16, vx: Math.cos(t.a)*6, vy: Math.sin(t.a)*6, owner: p }); 
+        }
         
         function updateTanks() {
             if(!document.getElementById('tanks-screen').classList.contains('active')) return;
             ctx.clearRect(0, 0, cvs.width, cvs.height);
-            if(t1.cd > 0) t1.cd--; if(t2.cd > 0) t2.cd--;
 
-            // ИСКУССТВЕННЫЙ ИНТЕЛЛЕКТ ТАНКА
+            // ИСКУССТВЕННЫЙ ИНТЕЛЛЕКТ
             if(isTankBot) {
                 keys[2] = {u:0, d:0, l:0, r:0}; 
                 let dx = t1.x - t2.x, dy = t1.y - t2.y;
@@ -215,39 +226,61 @@
                 let angleDiff = targetAngle - t2.a;
                 while(angleDiff <= -Math.PI) angleDiff += Math.PI*2;
                 while(angleDiff > Math.PI) angleDiff -= Math.PI*2;
-                if (Math.abs(angleDiff) > 0.1) { if(angleDiff > 0) keys[2].r = 1; else keys[2].l = 1; }
+                
+                if (Math.abs(angleDiff) > 0.15) { if(angleDiff > 0) keys[2].r = 1; else keys[2].l = 1; }
                 let dist = Math.hypot(dx, dy);
-                if (dist > 120) keys[2].u = 1; // Преследует
-                if (Math.abs(angleDiff) < 0.2 && dist < 250 && Math.random() < 0.05) tShoot(2); // Стреляет
+                
+                let nx = t2.x + Math.cos(t2.a)*t2.speed;
+                let ny = t2.y + Math.sin(t2.a)*t2.speed;
+                
+                // Бот пытается объехать препятствие
+                if (dist > 120) {
+                    if (!collideWall(nx, ny, false)) keys[2].u = 1; // Путь чист
+                    else keys[2].r = 1; // Уперся в стену - крутись
+                }
+                if (Math.abs(angleDiff) < 0.2 && dist < 300 && Math.random() < 0.05) tShoot(2); 
             }
 
+            // Движение Танка 1 с проверкой стен
             if(keys[1].l) t1.a -= 0.1; if(keys[1].r) t1.a += 0.1;
-            if(keys[1].u) { t1.x += Math.cos(t1.a)*t1.speed; t1.y += Math.sin(t1.a)*t1.speed; } if(keys[1].d) { t1.x -= Math.cos(t1.a)*t1.speed; t1.y -= Math.sin(t1.a)*t1.speed; }
+            if(keys[1].u) { let nx = t1.x + Math.cos(t1.a)*t1.speed, ny = t1.y + Math.sin(t1.a)*t1.speed; if(!collideWall(nx, ny, false)) { t1.x = nx; t1.y = ny; } } 
+            if(keys[1].d) { let nx = t1.x - Math.cos(t1.a)*t1.speed, ny = t1.y - Math.sin(t1.a)*t1.speed; if(!collideWall(nx, ny, false)) { t1.x = nx; t1.y = ny; } }
+            
+            // Движение Танка 2 с проверкой стен
             if(keys[2].l) t2.a -= 0.1; if(keys[2].r) t2.a += 0.1;
-            if(keys[2].u) { t2.x += Math.cos(t2.a)*t2.speed; t2.y += Math.sin(t2.a)*t2.speed; } if(keys[2].d) { t2.x -= Math.cos(t2.a)*t2.speed; t2.y -= Math.sin(t2.a)*t2.speed; }
+            if(keys[2].u) { let nx = t2.x + Math.cos(t2.a)*t2.speed, ny = t2.y + Math.sin(t2.a)*t2.speed; if(!collideWall(nx, ny, false)) { t2.x = nx; t2.y = ny; } } 
+            if(keys[2].d) { let nx = t2.x - Math.cos(t2.a)*t2.speed, ny = t2.y - Math.sin(t2.a)*t2.speed; if(!collideWall(nx, ny, false)) { t2.x = nx; t2.y = ny; } }
+            
             [t1, t2].forEach(t => { if(t.x<15) t.x=15; if(t.x>cvs.width-15) t.x=cvs.width-15; if(t.y<15) t.y=15; if(t.y>cvs.height-15) t.y=cvs.height-15; });
             
-            drawTank(t1); drawTank(t2);
+            drawWalls(); drawTank(t1); drawTank(t2);
 
             for(let i = bullets.length-1; i >= 0; i--) {
                 let b = bullets[i]; b.x += b.vx; b.y += b.vy;
-                ctx.fillStyle = 'yellow'; ctx.beginPath(); ctx.arc(b.x, b.y, 4, 0, Math.PI*2); ctx.fill();
+                ctx.fillStyle = 'yellow'; ctx.beginPath(); ctx.arc(b.x, b.y, 3, 0, Math.PI*2); ctx.fill();
+                
+                // Пуля разбивается об стену
+                if(collideWall(b.x, b.y, true)) { bullets.splice(i, 1); continue; }
+                
                 if(Math.hypot(b.x - t1.x, b.y - t1.y) < 18 && b.owner === 2) { tScore[1]++; document.getElementById('tank-score').innerText = `${tScore[0]} : ${tScore[1]}`; initTanks(); break; }
                 if(Math.hypot(b.x - t2.x, b.y - t2.y) < 18 && b.owner === 1) { tScore[0]++; document.getElementById('tank-score').innerText = `${tScore[0]} : ${tScore[1]}`; initTanks(); break; }
                 if(b.x<0 || b.x>cvs.width || b.y<0 || b.y>cvs.height) bullets.splice(i, 1);
             }
             tLoop = requestAnimationFrame(updateTanks);
         }
-        function drawTank(t) { ctx.save(); ctx.translate(t.x, t.y); ctx.rotate(t.a); ctx.fillStyle = t.color; ctx.fillRect(-12, -12, 24, 24); ctx.fillStyle = 'white'; ctx.fillRect(0, -3, 18, 6); ctx.restore(); }
+        
+        function drawWalls() {
+            ctx.shadowBlur = 15; ctx.shadowColor = '#00f3ff'; ctx.fillStyle = '#111'; ctx.strokeStyle = '#00f3ff'; ctx.lineWidth = 2;
+            for(let w of walls) { ctx.fillRect(w.x, w.y, w.w, w.h); ctx.strokeRect(w.x, w.y, w.w, w.h); }
+            ctx.shadowBlur = 0;
+        }
+
+        function drawTank(t) { ctx.save(); ctx.translate(t.x, t.y); ctx.rotate(t.a); ctx.fillStyle = t.color; ctx.fillRect(-12, -12, 24, 24); ctx.fillStyle = 'white'; ctx.fillRect(0, -3, 16, 6); ctx.restore(); }
         function stopTanks() { cancelAnimationFrame(tLoop); tLoop = null; tScore = [0,0]; document.getElementById('tank-score').innerText = "0 : 0"; }
 
-        // --- ОФФЛАЙН ШАШКИ (С РУБКОЙ И БОТОМ) ---
+        // --- ОФФЛАЙН ШАШКИ ---
         let offChkBoard = [], offChkTurn = 1, offChkSelected = null, isChkBot = false;
-        function startOffChk() { 
-            isChkBot = document.getElementById('chk-mode').value === 'bot';
-            offChkBoard = [0,2,0,2,0,2,0,2, 2,0,2,0,2,0,2,0, 0,2,0,2,0,2,0,2, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 1,0,1,0,1,0,1,0, 0,1,0,1,0,1,0,1, 1,0,1,0,1,0,1,0]; 
-            offChkTurn = 1; offChkSelected = null; renderOffChk(); 
-        }
+        function startOffChk() { isChkBot = document.getElementById('chk-mode').value === 'bot'; offChkBoard = [0,2,0,2,0,2,0,2, 2,0,2,0,2,0,2,0, 0,2,0,2,0,2,0,2, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 1,0,1,0,1,0,1,0, 0,1,0,1,0,1,0,1, 1,0,1,0,1,0,1,0]; offChkTurn = 1; offChkSelected = null; renderOffChk(); }
         function renderOffChk() {
             const bUi = document.getElementById('off-chk-board-ui'); bUi.innerHTML = '';
             offChkBoard.forEach((val, i) => {
@@ -261,33 +294,25 @@
         }
         function offChkClick(index) {
             if(isChkBot && offChkTurn === 2) return; 
-            if (offChkSelected === null) { 
-                if (offChkBoard[index] === offChkTurn) { offChkSelected = index; renderOffChk(); } 
-            } else { 
+            if (offChkSelected === null) { if (offChkBoard[index] === offChkTurn) { offChkSelected = index; renderOffChk(); } } 
+            else { 
                 if (offChkBoard[index] === 0) { 
-                    let r1 = Math.floor(offChkSelected/8), c1 = offChkSelected%8;
-                    let r2 = Math.floor(index/8), c2 = index%8;
-                    let isNormal = Math.abs(r2-r1)===1 && Math.abs(c2-c1)===1;
-                    let isJump = Math.abs(r2-r1)===2 && Math.abs(c2-c1)===2;
-                    let mid = offChkSelected + (index - offChkSelected) / 2;
-                    let enemy = offChkTurn === 1 ? 2 : 1;
-                    
+                    let r1 = Math.floor(offChkSelected/8), c1 = offChkSelected%8; let r2 = Math.floor(index/8), c2 = index%8;
+                    let isNormal = Math.abs(r2-r1)===1 && Math.abs(c2-c1)===1; let isJump = Math.abs(r2-r1)===2 && Math.abs(c2-c1)===2;
+                    let mid = offChkSelected + (index - offChkSelected) / 2; let enemy = offChkTurn === 1 ? 2 : 1;
                     let moved = false;
                     if(isNormal) { offChkBoard[index] = offChkTurn; offChkBoard[offChkSelected] = 0; moved = true; } 
-                    else if(isJump && offChkBoard[mid] === enemy) { offChkBoard[index] = offChkTurn; offChkBoard[offChkSelected] = 0; offChkBoard[mid] = 0; moved = true; } // РУБИМ ФИГУРУ
-
+                    else if(isJump && offChkBoard[mid] === enemy) { offChkBoard[index] = offChkTurn; offChkBoard[offChkSelected] = 0; offChkBoard[mid] = 0; moved = true; } 
                     if(moved) { offChkTurn = offChkTurn === 1 ? 2 : 1; if(isChkBot && offChkTurn === 2) setTimeout(makeChkBotMove, 700); }
                 } 
                 offChkSelected = null; renderOffChk(); 
             }
         }
         
-        // ИИ ШАШЕК (УМЕЕТ РУБИТЬ)
         function makeChkBotMove() {
             let pieces = []; for(let i=0; i<64; i++) if(offChkBoard[i] === 2) pieces.push(i);
             pieces.sort(() => Math.random() - 0.5); 
             let moved = false;
-            // Сначала пытаемся срубить
             for(let p of pieces) {
                 let jumps = [p-18, p-14, p+14, p+18];
                 for(let j of jumps) {
@@ -301,10 +326,9 @@
                 }
                 if(moved) break;
             }
-            // Если рубить некого, ходим просто вперед
             if(!moved) {
                 for(let p of pieces) {
-                    let moves = [p+7, p+9]; // Красные двигаются вниз по массиву (числа растут)
+                    let moves = [p+7, p+9];
                     for(let m of moves) {
                         if(m>=0 && m<64 && offChkBoard[m]===0 && Math.abs(Math.floor(p/8)-Math.floor(m/8))===1) { offChkBoard[m] = 2; offChkBoard[p] = 0; moved = true; break; }
                     }
@@ -335,7 +359,6 @@
             if(currentGame === 'seabattle') showScreen('seabattle-screen');
             if(currentGame === 'quiz') showScreen('quiz-screen');
             if(currentGame === 'pingpong') showScreen('pingpong-screen');
-            
             socket.emit('join_room', { roomId: currentRoom, playerName: name, gameType: currentGame, durakDeckSize: dSize });
         }
         function leaveOnline() { window.location.reload(); }
