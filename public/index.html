@@ -10,26 +10,21 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Montserrat', sans-serif; user-select: none; -webkit-tap-highlight-color: transparent; }
         body { background: radial-gradient(circle at 50% 0%, #0a192f 0%, #030305 80%); color: var(--text); text-align: center; padding: env(safe-area-inset-top) 15px env(safe-area-inset-bottom) 15px; overflow-x: hidden; overscroll-behavior-y: contain; touch-action: pan-x pan-y; }
         .author-tag { position: absolute; top: 10px; right: 15px; font-size: 0.7rem; color: rgba(255,255,255,0.4); font-weight: 700; text-transform: uppercase; z-index: 100; letter-spacing: 1px; }
-        
         h1 { font-size: 2.2rem; font-weight: 900; text-transform: uppercase; margin-bottom: 20px; line-height: 1.1; }
         h1 span { background: linear-gradient(135deg, #ffffff 0%, #b3e5fc 25%, var(--pool-cyan) 50%, #b3e5fc 75%, #ffffff 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 15px rgba(0, 243, 255, 0.6), 0 0 30px rgba(255, 255, 255, 0.1); }
-
         .screen { display: none; flex-direction: column; align-items: center; width: 100%; min-height: 90vh; justify-content: center; animation: fadeIn 0.3s; position: relative; }
         .screen.active { display: flex; }
         @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
         
         input, select { width: 100%; max-width: 320px; padding: 15px; background: rgba(0,0,0,0.6); border: 1px solid var(--pool-cyan); color: white; border-radius: 12px; margin-bottom: 12px; font-size: 1.1rem; text-align: center; outline: none; box-shadow: inset 0 0 10px rgba(0,0,0,0.8); }
         option { background: #030305; color: white; }
-        
-        .btn { background: var(--glass); border: 1px solid var(--pool-cyan); color: var(--pool-cyan); padding: 16px; font-size: 1.1rem; font-weight: 700; border-radius: 12px; cursor: pointer; text-transform: uppercase; width: 100%; max-width: 320px; margin-bottom: 12px; transition: 0.1s; box-shadow: 0 4px 15px rgba(0,0,0,0.3), inset 0 0 10px rgba(0,243,255,0.1); backdrop-filter: blur(5px); }
+        .btn { background: var(--glass); border: 1px solid var(--pool-cyan); color: var(--pool-cyan); padding: 16px; font-size: 1.1rem; font-weight: 700; border-radius: 12px; cursor: pointer; text-transform: uppercase; width: 100%; max-width: 320px; margin-bottom: 12px; transition: 0.1s; box-shadow: 0 4px 15px rgba(0,0,0,0.3), inset 0 0 10px rgba(0,243,255,0.1); backdrop-filter: blur(5px); touch-action: manipulation; }
         .btn:active { background: var(--pool-cyan); color: #000; transform: scale(0.96); box-shadow: 0 0 20px var(--pool-cyan); }
-        .btn-danger { border-color: var(--danger); color: var(--danger); box-shadow: inset 0 0 10px rgba(255,0,85,0.1); }
-        .btn-danger:active { background: var(--danger); color: white; box-shadow: 0 0 20px var(--danger); }
+        .btn-danger { border-color: var(--danger); color: var(--danger); }
         .btn-purple { border-color: var(--purple); color: var(--purple); }
         .btn-gold { border-color: var(--gold); color: var(--gold); }
         .room-item { background: var(--glass); border: 1px solid rgba(0,243,255,0.3); padding: 15px; border-radius: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 320px; cursor: pointer; }
         
-        /* Игровые доски */
         .board { display: grid; gap: 5px; width: 100%; margin: 20px auto; max-width: 320px; }
         .cell { background: var(--glass); border: 2px solid rgba(0,243,255,0.2); aspect-ratio: 1; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 3rem; font-weight: 900; color: white; cursor: pointer;}
         .chk-board { display: grid; grid-template-columns: repeat(8, 1fr); gap: 2px; width: 100%; max-width: 340px; margin: 15px auto; background: var(--pool-cyan); padding: 2px; border-radius: 8px; }
@@ -47,9 +42,14 @@
         #tank-canvas { background: #08080a; border: 2px solid var(--success); border-radius: 12px; max-width: 100%; image-rendering: pixelated; }
         .tank-controls { width: 100%; max-width: 340px; display: flex; justify-content: space-between; padding: 10px; }
         .t-pad { display: grid; grid-template-columns: repeat(3, 45px); gap: 5px; }
-        .t-btn { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); height: 45px; border-radius: 8px; display: flex; justify-content: center; align-items: center; font-size: 1.5rem; color: white; }
-        .t-fire { background: rgba(255,0,85,0.2); border: 2px solid var(--danger); width: 65px; height: 65px; border-radius: 50%; font-weight: 900; display: flex; align-items:center; justify-content:center; }
+        /* ЖЕСТКАЯ БЛОКИРОВКА ЭКРАНА НА КНОПКАХ ТАНКОВ */
+        .t-btn, .t-fire { touch-action: none; user-select: none; cursor: pointer; display: flex; justify-content: center; align-items: center; font-weight: 900; color: white; }
+        .t-btn { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); height: 45px; border-radius: 8px; font-size: 1.5rem; }
+        .t-btn:active { background: white; color: black; }
+        .t-fire { background: rgba(255,0,85,0.2); border: 2px solid var(--danger); width: 65px; height: 65px; border-radius: 50%; font-size: 1.2rem; }
+        .t-fire:active { background: var(--danger); color: white; box-shadow: 0 0 20px var(--danger); }
         .p2-controls { transform: rotate(180deg); }
+        
         #pong-container { width: 100%; max-width: 340px; aspect-ratio: 1; background: #0a0a0f; border: 2px solid var(--pool-cyan); position: relative; touch-action: none; border-radius: 12px; overflow: hidden; }
         .pong-paddle { position: absolute; width: 4%; height: 20%; background: white; border-radius: 5px; }
         #pong-ball { position: absolute; width: 5%; height: 5%; background: var(--success); border-radius: 50%; transform: translate(-50%, -50%); }
@@ -58,44 +58,38 @@
 <body>
     <div class="author-tag">Автор: Денис Максатбеков)) | @prodelal</div>
 
-    <!-- МЕНЮ -->
     <div id="main-menu" class="screen active">
         <h1>ПЛОВЦЕНТР <span>HUB</span></h1>
         <button class="btn btn-purple" onclick="showScreen('offline-menu')">🍻 ОФФЛАЙН (Рядом)</button>
         <button class="btn" onclick="showScreen('online-lobby')">🌐 ОНЛАЙН (Сетевая)</button>
     </div>
 
-    <!-- ОФФЛАЙН -->
     <div id="offline-menu" class="screen">
         <h1>ОФФЛАЙН <span>ИГРЫ</span></h1>
-        
         <div style="background:var(--glass); padding:10px; border-radius:10px; margin-bottom:10px; width:100%; max-width:320px;">
             <p style="color:var(--success); margin-bottom:5px; font-weight:bold;">💥 ТАНКИ 2D</p>
             <select id="tank-mode" style="margin-bottom:5px;"><option value="pvp">С другом (PVP)</option><option value="bot">С Ботом (ИИ)</option></select>
             <button class="btn btn-success" style="border-color:var(--success); color:var(--success);" onclick="showScreen('tanks-screen'); initTanks();">ИГРАТЬ</button>
         </div>
-
         <div style="background:var(--glass); padding:10px; border-radius:10px; margin-bottom:10px; width:100%; max-width:320px;">
             <p style="color:white; margin-bottom:5px; font-weight:bold;">🏁 ШАШКИ</p>
             <select id="chk-mode" style="margin-bottom:5px;"><option value="pvp">С другом (PVP)</option><option value="bot">С Ботом (ИИ)</option></select>
             <button class="btn" onclick="showScreen('off-checkers-screen'); startOffChk();">ИГРАТЬ</button>
         </div>
-
         <button class="btn" onclick="showScreen('mafia-setup')">🕵️‍♂️ Умная Мафия</button>
         <button class="btn btn-gold" onclick="showScreen('rush-screen'); startRush();">💎 Лихорадка (2-4)</button>
         <button class="btn btn-danger" onclick="showScreen('main-menu')" style="margin-top: 10px;">Назад</button>
     </div>
 
-    <!-- ОФФЛАЙН ЭКРАНЫ -->
     <div id="tanks-screen" class="screen" style="justify-content: space-between; padding: 0;">
         <div class="tank-controls p2-controls" id="t2-panel">
-            <div class="t-pad"><div></div><div class="t-btn" ontouchstart="tInp(2,'u',1)" ontouchend="tInp(2,'u',0)">↑</div><div></div><div class="t-btn" ontouchstart="tInp(2,'l',1)" ontouchend="tInp(2,'l',0)">←</div><div class="t-btn" ontouchstart="tInp(2,'d',1)" ontouchend="tInp(2,'d',0)">↓</div><div class="t-btn" ontouchstart="tInp(2,'r',1)" ontouchend="tInp(2,'r',0)">→</div></div>
-            <div class="t-fire" ontouchstart="tShoot(2)">P2</div>
+            <div class="t-pad"><div></div><div class="t-btn" onpointerdown="tInp(2,'u',1)" onpointerup="tInp(2,'u',0)" onpointerleave="tInp(2,'u',0)" oncontextmenu="return false;">↑</div><div></div><div class="t-btn" onpointerdown="tInp(2,'l',1)" onpointerup="tInp(2,'l',0)" onpointerleave="tInp(2,'l',0)" oncontextmenu="return false;">←</div><div class="t-btn" onpointerdown="tInp(2,'d',1)" onpointerup="tInp(2,'d',0)" onpointerleave="tInp(2,'d',0)" oncontextmenu="return false;">↓</div><div class="t-btn" onpointerdown="tInp(2,'r',1)" onpointerup="tInp(2,'r',0)" onpointerleave="tInp(2,'r',0)" oncontextmenu="return false;">→</div></div>
+            <div class="t-fire" onpointerdown="tShoot(2)" oncontextmenu="return false;">P2</div>
         </div>
         <div><h3 style="margin-bottom:5px;">Счет: <span id="tank-score" style="color:var(--pool-cyan)">0 : 0</span></h3><canvas id="tank-canvas" width="300" height="350"></canvas></div>
         <div class="tank-controls">
-            <div class="t-pad"><div></div><div class="t-btn" ontouchstart="tInp(1,'u',1)" ontouchend="tInp(1,'u',0)">↑</div><div></div><div class="t-btn" ontouchstart="tInp(1,'l',1)" ontouchend="tInp(1,'l',0)">←</div><div class="t-btn" ontouchstart="tInp(1,'d',1)" ontouchend="tInp(1,'d',0)">↓</div><div class="t-btn" ontouchstart="tInp(1,'r',1)" ontouchend="tInp(1,'r',0)">→</div></div>
-            <div class="t-fire" ontouchstart="tShoot(1)">P1</div>
+            <div class="t-pad"><div></div><div class="t-btn" onpointerdown="tInp(1,'u',1)" onpointerup="tInp(1,'u',0)" onpointerleave="tInp(1,'u',0)" oncontextmenu="return false;">↑</div><div></div><div class="t-btn" onpointerdown="tInp(1,'l',1)" onpointerup="tInp(1,'l',0)" onpointerleave="tInp(1,'l',0)" oncontextmenu="return false;">←</div><div class="t-btn" onpointerdown="tInp(1,'d',1)" onpointerup="tInp(1,'d',0)" onpointerleave="tInp(1,'d',0)" oncontextmenu="return false;">↓</div><div class="t-btn" onpointerdown="tInp(1,'r',1)" onpointerup="tInp(1,'r',0)" onpointerleave="tInp(1,'r',0)" oncontextmenu="return false;">→</div></div>
+            <div class="t-fire" onpointerdown="tShoot(1)" oncontextmenu="return false;">P1</div>
         </div>
         <button class="btn btn-danger" onclick="stopTanks(); showScreen('offline-menu')" style="max-width: 200px; padding: 10px; margin-bottom:10px;">Выход</button>
     </div>
@@ -122,16 +116,15 @@
     <div id="rush-screen" class="screen">
         <h1>Алмазная <span>Лихорадка</span></h1><p style="margin-bottom:10px;">Жди 💎 в центре. Кто первый тапнет угол — берет очко!</p>
         <div style="position:relative; width:100%; max-width:350px; height:45vh; background:#111; border:2px solid var(--pool-cyan); border-radius:15px; margin-bottom:20px;">
-            <div ontouchstart="rushTap(0)" style="position:absolute; width:40%; height:40%; top:10px; left:10px; background:var(--pool-cyan); border-radius:12px; color:black; font-size:1.5rem; font-weight:900; display:flex; align-items:center; justify-content:center;">P1 <span id="r-score-1" style="margin-left:10px;">0</span></div>
-            <div ontouchstart="rushTap(1)" style="position:absolute; width:40%; height:40%; top:10px; right:10px; background:var(--danger); border-radius:12px; font-size:1.5rem; font-weight:900; display:flex; align-items:center; justify-content:center;">P2 <span id="r-score-2" style="margin-left:10px;">0</span></div>
+            <div onpointerdown="rushTap(0)" style="position:absolute; width:40%; height:40%; top:10px; left:10px; background:var(--pool-cyan); border-radius:12px; color:black; font-size:1.5rem; font-weight:900; display:flex; align-items:center; justify-content:center; touch-action:none;">P1 <span id="r-score-1" style="margin-left:10px;">0</span></div>
+            <div onpointerdown="rushTap(1)" style="position:absolute; width:40%; height:40%; top:10px; right:10px; background:var(--danger); border-radius:12px; font-size:1.5rem; font-weight:900; display:flex; align-items:center; justify-content:center; touch-action:none;">P2 <span id="r-score-2" style="margin-left:10px;">0</span></div>
             <div id="rush-center" style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-size:4rem; text-shadow:0 0 20px white;">⏳</div>
-            <div ontouchstart="rushTap(2)" style="position:absolute; width:40%; height:40%; bottom:10px; left:10px; background:var(--success); border-radius:12px; color:black; font-size:1.5rem; font-weight:900; display:flex; align-items:center; justify-content:center;">P3 <span id="r-score-3" style="margin-left:10px;">0</span></div>
-            <div ontouchstart="rushTap(3)" style="position:absolute; width:40%; height:40%; bottom:10px; right:10px; background:var(--purple); border-radius:12px; font-size:1.5rem; font-weight:900; display:flex; align-items:center; justify-content:center;">P4 <span id="r-score-4" style="margin-left:10px;">0</span></div>
+            <div onpointerdown="rushTap(2)" style="position:absolute; width:40%; height:40%; bottom:10px; left:10px; background:var(--success); border-radius:12px; color:black; font-size:1.5rem; font-weight:900; display:flex; align-items:center; justify-content:center; touch-action:none;">P3 <span id="r-score-3" style="margin-left:10px;">0</span></div>
+            <div onpointerdown="rushTap(3)" style="position:absolute; width:40%; height:40%; bottom:10px; right:10px; background:var(--purple); border-radius:12px; font-size:1.5rem; font-weight:900; display:flex; align-items:center; justify-content:center; touch-action:none;">P4 <span id="r-score-4" style="margin-left:10px;">0</span></div>
         </div>
         <button class="btn btn-danger" onclick="clearTimeout(rushTimeout); showScreen('offline-menu');">Выход</button>
     </div>
 
-    <!-- ОНЛАЙН -->
     <div id="online-lobby" class="screen">
         <h1>ПЛОВЦЕНТР <span>ОНЛАЙН</span></h1>
         <div style="width: 100%; max-width: 320px; text-align: left; margin-bottom: 20px;">
@@ -141,10 +134,7 @@
         <input type="text" id="player-name" placeholder="Твое имя">
         <input type="text" id="room-id" placeholder="Код комнаты">
         <select id="game-type" onchange="toggleDurakSettings()"><option value="pingpong">🏓 Пинг-Понг</option><option value="durak">🃏 Дурак</option><option value="seabattle">🚢 Морской Бой</option><option value="checkers">🏁 Шашки</option><option value="tictactoe">✖️ Крестики-Нолики</option><option value="quiz">🧠 Квиз-Батл</option></select>
-        
-        <!-- Настройки Дурака (появляются только если выбран Дурак) -->
         <select id="durak-deck-size" style="display:none; border-color:var(--gold);"><option value="36">Колода: 36 карт</option><option value="24">Колода: 24 карты</option><option value="52">Колода: 52 карты</option></select>
-        
         <button class="btn" onclick="joinOnlineRoom()">Войти / Создать</button>
         <button class="btn btn-danger" onclick="showScreen('main-menu')">Назад</button>
     </div>
@@ -166,13 +156,9 @@
     <script src="/socket.io/socket.io.js"></script>
     <script>
         function showScreen(id) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); window.scrollTo(0, 0); }
+        function toggleDurakSettings() { document.getElementById('durak-deck-size').style.display = document.getElementById('game-type').value === 'durak' ? 'block' : 'none'; }
 
-        function toggleDurakSettings() {
-            const gt = document.getElementById('game-type').value;
-            document.getElementById('durak-deck-size').style.display = gt === 'durak' ? 'block' : 'none';
-        }
-
-        // ================= ОФФЛАЙН: МАФИЯ =================
+        // --- МАФИЯ ---
         let mafiaRoles = [], currentMafiaIndex = 0;
         function calcMafia() {
             let t = parseInt(document.getElementById('m-total').value)||0, m = parseInt(document.getElementById('m-maf').value)||0, d = parseInt(document.getElementById('m-doc').value)||0, s = parseInt(document.getElementById('m-sher').value)||0;
@@ -194,14 +180,14 @@
         function showMafiaRole() { document.getElementById('mafia-hidden-text').style.display = 'none'; let r = mafiaRoles[currentMafiaIndex]; let el = document.getElementById('mafia-role-reveal'); el.innerText = r; el.style.display = 'block'; el.style.color = r.includes('МАФИ') ? 'var(--danger)' : r.includes('ДОК') ? 'var(--success)' : r.includes('ШЕР') ? 'var(--pool-cyan)' : 'white'; document.getElementById('btn-show-role').style.display = 'none'; document.getElementById('btn-next-role').style.display = 'block'; }
         function nextMafiaRole() { currentMafiaIndex++; if(currentMafiaIndex >= mafiaRoles.length) { alert("Город засыпает..."); showScreen('offline-menu'); } else { document.getElementById('mafia-player-num').innerText = currentMafiaIndex + 1; document.getElementById('mafia-hidden-text').style.display = 'block'; document.getElementById('mafia-role-reveal').style.display = 'none'; document.getElementById('btn-show-role').style.display = 'block'; document.getElementById('btn-next-role').style.display = 'none'; } }
 
-        // ================= ОФФЛАЙН: ЛИХОРАДКА =================
+        // --- ЛИХОРАДКА ---
         let rushScores = [0,0,0,0], rushActive = false, rushTimeout;
         function startRush() { rushScores = [0,0,0,0]; updateRushScores(); nextRushRound(); }
         function nextRushRound() { rushActive = false; document.getElementById('rush-center').innerText = "⏳"; rushTimeout = setTimeout(() => { document.getElementById('rush-center').innerText = "💎"; rushActive = true; }, Math.random() * 3000 + 1500); }
         function rushTap(pIdx) { if (!rushActive) return; rushActive = false; clearTimeout(rushTimeout); rushScores[pIdx]++; updateRushScores(); if (rushScores[pIdx] >= 5) { document.getElementById('rush-center').innerText = `P${pIdx+1} ВИН!`; setTimeout(startRush, 3000); } else { document.getElementById('rush-center').innerText = "🔥"; setTimeout(nextRushRound, 1500); } }
         function updateRushScores() { for(let i=0; i<4; i++) document.getElementById(`r-score-${i+1}`).innerText = rushScores[i]; }
 
-        // ================= ОФФЛАЙН: ТАНКИ + УМНЫЙ ИИ =================
+        // --- ТАНКИ 2D (УМНЫЙ БОТ + onpointerdown) ---
         const cvs = document.getElementById('tank-canvas'); const ctx = cvs.getContext('2d');
         let tLoop, t1, t2, bullets = [], tScore = [0,0], isTankBot = false;
         const keys = { 1:{u:0,d:0,l:0,r:0}, 2:{u:0,d:0,l:0,r:0} };
@@ -209,9 +195,9 @@
         
         function initTanks() {
             isTankBot = document.getElementById('tank-mode').value === 'bot';
-            document.getElementById('t2-panel').style.opacity = isTankBot ? '0.2' : '1'; // Прячем кнопки бота
-            t1 = { x: 150, y: 300, a: -Math.PI/2, speed: 2.5, color: '#00f3ff', cd: 0 }; 
-            t2 = { x: 150, y: 50, a: Math.PI/2, speed: 2.5, color: '#ff0055', cd: 0 };
+            document.getElementById('t2-panel').style.opacity = isTankBot ? '0.2' : '1'; 
+            t1 = { x: 150, y: 300, a: -Math.PI/2, speed: 2.8, color: '#00f3ff', cd: 0 }; 
+            t2 = { x: 150, y: 50, a: Math.PI/2, speed: 2.8, color: '#ff0055', cd: 0 };
             bullets = []; if(!tLoop) tLoop = requestAnimationFrame(updateTanks);
         }
         function tShoot(p) { let t = p === 1 ? t1 : t2; if(t.cd > 0) return; t.cd = 20; bullets.push({ x: t.x + Math.cos(t.a)*15, y: t.y + Math.sin(t.a)*15, vx: Math.cos(t.a)*6, vy: Math.sin(t.a)*6, owner: p }); }
@@ -221,35 +207,31 @@
             ctx.clearRect(0, 0, cvs.width, cvs.height);
             if(t1.cd > 0) t1.cd--; if(t2.cd > 0) t2.cd--;
 
-            // ИИ БОТА (Танк 2)
+            // ИСКУССТВЕННЫЙ ИНТЕЛЛЕКТ ТАНКА
             if(isTankBot) {
-                keys[2] = {u:0, d:0, l:0, r:0}; // Сброс
-                let dx = t1.x - t2.x; let dy = t1.y - t2.y;
+                keys[2] = {u:0, d:0, l:0, r:0}; 
+                let dx = t1.x - t2.x, dy = t1.y - t2.y;
                 let targetAngle = Math.atan2(dy, dx);
                 let angleDiff = targetAngle - t2.a;
-                // Нормализация угла
                 while(angleDiff <= -Math.PI) angleDiff += Math.PI*2;
                 while(angleDiff > Math.PI) angleDiff -= Math.PI*2;
-
                 if (Math.abs(angleDiff) > 0.1) { if(angleDiff > 0) keys[2].r = 1; else keys[2].l = 1; }
                 let dist = Math.hypot(dx, dy);
-                if (dist > 100) keys[2].u = 1; // Ехать к игроку
-                if (Math.abs(angleDiff) < 0.2 && dist < 250 && Math.random() < 0.05) tShoot(2); // Стрелять
+                if (dist > 120) keys[2].u = 1; // Преследует
+                if (Math.abs(angleDiff) < 0.2 && dist < 250 && Math.random() < 0.05) tShoot(2); // Стреляет
             }
 
-            // Движение
-            if(keys[1].l) t1.a -= 0.08; if(keys[1].r) t1.a += 0.08;
+            if(keys[1].l) t1.a -= 0.1; if(keys[1].r) t1.a += 0.1;
             if(keys[1].u) { t1.x += Math.cos(t1.a)*t1.speed; t1.y += Math.sin(t1.a)*t1.speed; } if(keys[1].d) { t1.x -= Math.cos(t1.a)*t1.speed; t1.y -= Math.sin(t1.a)*t1.speed; }
-            if(keys[2].l) t2.a -= 0.08; if(keys[2].r) t2.a += 0.08;
+            if(keys[2].l) t2.a -= 0.1; if(keys[2].r) t2.a += 0.1;
             if(keys[2].u) { t2.x += Math.cos(t2.a)*t2.speed; t2.y += Math.sin(t2.a)*t2.speed; } if(keys[2].d) { t2.x -= Math.cos(t2.a)*t2.speed; t2.y -= Math.sin(t2.a)*t2.speed; }
-            [t1, t2].forEach(t => { if(t.x<12) t.x=12; if(t.x>cvs.width-12) t.x=cvs.width-12; if(t.y<12) t.y=12; if(t.y>cvs.height-12) t.y=cvs.height-12; });
+            [t1, t2].forEach(t => { if(t.x<15) t.x=15; if(t.x>cvs.width-15) t.x=cvs.width-15; if(t.y<15) t.y=15; if(t.y>cvs.height-15) t.y=cvs.height-15; });
             
             drawTank(t1); drawTank(t2);
 
-            // Пули
             for(let i = bullets.length-1; i >= 0; i--) {
                 let b = bullets[i]; b.x += b.vx; b.y += b.vy;
-                ctx.fillStyle = 'yellow'; ctx.beginPath(); ctx.arc(b.x, b.y, 3, 0, Math.PI*2); ctx.fill();
+                ctx.fillStyle = 'yellow'; ctx.beginPath(); ctx.arc(b.x, b.y, 4, 0, Math.PI*2); ctx.fill();
                 if(Math.hypot(b.x - t1.x, b.y - t1.y) < 18 && b.owner === 2) { tScore[1]++; document.getElementById('tank-score').innerText = `${tScore[0]} : ${tScore[1]}`; initTanks(); break; }
                 if(Math.hypot(b.x - t2.x, b.y - t2.y) < 18 && b.owner === 1) { tScore[0]++; document.getElementById('tank-score').innerText = `${tScore[0]} : ${tScore[1]}`; initTanks(); break; }
                 if(b.x<0 || b.x>cvs.width || b.y<0 || b.y>cvs.height) bullets.splice(i, 1);
@@ -259,7 +241,7 @@
         function drawTank(t) { ctx.save(); ctx.translate(t.x, t.y); ctx.rotate(t.a); ctx.fillStyle = t.color; ctx.fillRect(-12, -12, 24, 24); ctx.fillStyle = 'white'; ctx.fillRect(0, -3, 18, 6); ctx.restore(); }
         function stopTanks() { cancelAnimationFrame(tLoop); tLoop = null; tScore = [0,0]; document.getElementById('tank-score').innerText = "0 : 0"; }
 
-        // ================= ОФФЛАЙН: ШАШКИ + БОТ =================
+        // --- ОФФЛАЙН ШАШКИ (С РУБКОЙ И БОТОМ) ---
         let offChkBoard = [], offChkTurn = 1, offChkSelected = null, isChkBot = false;
         function startOffChk() { 
             isChkBot = document.getElementById('chk-mode').value === 'bot';
@@ -278,40 +260,63 @@
             document.getElementById('off-chk-status').style.color = offChkTurn === 1 ? "var(--pool-cyan)" : "var(--danger)";
         }
         function offChkClick(index) {
-            if(isChkBot && offChkTurn === 2) return; // Игрок не может ходить за бота
-            if (offChkSelected === null) { if (offChkBoard[index] === offChkTurn) { offChkSelected = index; renderOffChk(); } } 
-            else { 
+            if(isChkBot && offChkTurn === 2) return; 
+            if (offChkSelected === null) { 
+                if (offChkBoard[index] === offChkTurn) { offChkSelected = index; renderOffChk(); } 
+            } else { 
                 if (offChkBoard[index] === 0) { 
-                    // Простая проверка хода (для оффлайна без строгих правил рубки для экономии места)
-                    offChkBoard[index] = offChkTurn; offChkBoard[offChkSelected] = 0; 
-                    offChkTurn = offChkTurn === 1 ? 2 : 1; 
-                    if(isChkBot && offChkTurn === 2) setTimeout(makeChkBotMove, 800);
+                    let r1 = Math.floor(offChkSelected/8), c1 = offChkSelected%8;
+                    let r2 = Math.floor(index/8), c2 = index%8;
+                    let isNormal = Math.abs(r2-r1)===1 && Math.abs(c2-c1)===1;
+                    let isJump = Math.abs(r2-r1)===2 && Math.abs(c2-c1)===2;
+                    let mid = offChkSelected + (index - offChkSelected) / 2;
+                    let enemy = offChkTurn === 1 ? 2 : 1;
+                    
+                    let moved = false;
+                    if(isNormal) { offChkBoard[index] = offChkTurn; offChkBoard[offChkSelected] = 0; moved = true; } 
+                    else if(isJump && offChkBoard[mid] === enemy) { offChkBoard[index] = offChkTurn; offChkBoard[offChkSelected] = 0; offChkBoard[mid] = 0; moved = true; } // РУБИМ ФИГУРУ
+
+                    if(moved) { offChkTurn = offChkTurn === 1 ? 2 : 1; if(isChkBot && offChkTurn === 2) setTimeout(makeChkBotMove, 700); }
                 } 
                 offChkSelected = null; renderOffChk(); 
             }
         }
-        // Простой ИИ Бота для шашек (выбирает случайную свою шашку и делает ход вперед)
+        
+        // ИИ ШАШЕК (УМЕЕТ РУБИТЬ)
         function makeChkBotMove() {
-            let pieces = [];
-            for(let i=0; i<64; i++) if(offChkBoard[i] === 2) pieces.push(i);
-            pieces.sort(() => Math.random() - 0.5); // Случайный порядок
+            let pieces = []; for(let i=0; i<64; i++) if(offChkBoard[i] === 2) pieces.push(i);
+            pieces.sort(() => Math.random() - 0.5); 
             let moved = false;
+            // Сначала пытаемся срубить
             for(let p of pieces) {
-                let r = Math.floor(p/8), c = p%8;
-                let moves = [p+7, p+9]; // Вперед для красных (вниз доски)
-                for(let m of moves) {
-                    if(m>=0 && m<64 && offChkBoard[m] === 0 && Math.abs((m%8)-c) === 1) {
-                        offChkBoard[m] = 2; offChkBoard[p] = 0; moved = true; break;
+                let jumps = [p-18, p-14, p+14, p+18];
+                for(let j of jumps) {
+                    if(j>=0 && j<64 && offChkBoard[j]===0) {
+                        let r1 = Math.floor(p/8), c1 = p%8, r2 = Math.floor(j/8), c2 = j%8;
+                        if(Math.abs(r2-r1)===2 && Math.abs(c2-c1)===2) {
+                            let mid = p + (j-p)/2;
+                            if(offChkBoard[mid] === 1) { offChkBoard[j] = 2; offChkBoard[p] = 0; offChkBoard[mid] = 0; moved = true; break; }
+                        }
                     }
                 }
                 if(moved) break;
             }
-            offChkTurn = 1; renderOffChk();
+            // Если рубить некого, ходим просто вперед
+            if(!moved) {
+                for(let p of pieces) {
+                    let moves = [p+7, p+9]; // Красные двигаются вниз по массиву (числа растут)
+                    for(let m of moves) {
+                        if(m>=0 && m<64 && offChkBoard[m]===0 && Math.abs(Math.floor(p/8)-Math.floor(m/8))===1) { offChkBoard[m] = 2; offChkBoard[p] = 0; moved = true; break; }
+                    }
+                    if(moved) break;
+                }
+            }
+            if(moved) offChkTurn = 1; renderOffChk();
         }
 
-        // ================= ОНЛАЙН СОКЕТЫ =================
+        // --- ОНЛАЙН СОКЕТЫ ---
         const socket = io();
-        let currentRoom = "", currentGame = ""; mySymbol = "", selectedChk = null;
+        let currentRoom = "", currentGame = "", mySymbol = "", selectedChk = null;
         const gameNames = { 'durak': 'Дурак', 'pingpong': 'Пинг-Понг', 'checkers': 'Шашки', 'seabattle': 'Морской Бой', 'quiz': 'Квиз', 'tictactoe': 'Крестики' };
 
         socket.on('update_room_list', (rooms) => {
@@ -331,7 +336,6 @@
             if(currentGame === 'quiz') showScreen('quiz-screen');
             if(currentGame === 'pingpong') showScreen('pingpong-screen');
             
-            // Передаем размер колоды на сервер
             socket.emit('join_room', { roomId: currentRoom, playerName: name, gameType: currentGame, durakDeckSize: dSize });
         }
         function leaveOnline() { window.location.reload(); }
