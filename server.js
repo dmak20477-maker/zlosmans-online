@@ -123,16 +123,14 @@ io.on('connection', (socket) => {
     });
 });
 
-// ФИНАЛЬНАЯ ЧАСТЬ С ЗАПУСКОМ ОБЛАЧНОГО БОТА (БЕЗ ДУБЛЕЙ ПОРТОВ)
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
     console.log(`=========================================`);
     console.log(`🚀 СЕРВЕР ПЛОВЦЕНТР УСПЕШНО ЗАПУЩЕН!`);
-    console.log(`💎 Автор: Денис Максатбеков))`);
+    console.log(`💎 Автор: Денис | Личка: @ekx888d`);
     console.log(`🔥 Порт: ${PORT}`);
     console.log(`=========================================`);
 
-    // Запускаем бота через child_process
     try {
         const { exec } = require('child_process');
         console.log('📡 Попытка пробуждения Telegram-бота в облаке...');
