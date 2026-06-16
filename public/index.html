@@ -3,183 +3,296 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ZLOSMANS | Online</title>
+    <title>ZLOSMANS | MEGA HUB</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        :root { --bg: #0b0b0f; --neon: #00f3ff; --danger: #ff0055; --text: #ffffff; --glass: rgba(255,255,255,0.05); }
+        :root { --bg: #0b0b0f; --neon: #00f3ff; --danger: #ff0055; --text: #ffffff; --glass: rgba(255,255,255,0.05); --success: #00ff64; --purple: #b700ff; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Montserrat', sans-serif; user-select: none; }
         body { background: var(--bg); color: var(--text); text-align: center; padding: 15px; overflow-x: hidden; touch-action: manipulation; }
         
-        h1 { font-size: 2.2rem; font-weight: 900; text-transform: uppercase; margin-bottom: 15px; }
+        h1 { font-size: 2.2rem; font-weight: 900; text-transform: uppercase; margin-bottom: 15px; line-height: 1.1; }
         h1 span { color: var(--neon); text-shadow: 0 0 15px rgba(0,243,255,0.5); }
+        p { color: #a0a0b5; margin-bottom: 20px; font-size: 0.9rem; }
         
-        .screen { display: none; flex-direction: column; align-items: center; width: 100%; height: 90vh; justify-content: center; }
+        .screen { display: none; flex-direction: column; align-items: center; width: 100%; min-height: 90vh; justify-content: center; animation: fadeIn 0.3s; }
         .screen.active { display: flex; }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
         
+        .glass-box { background: var(--glass); backdrop-filter: blur(10px); border: 1px solid rgba(0,243,255,0.2); padding: 20px; border-radius: 15px; width: 100%; max-width: 400px; margin-bottom: 20px; }
         input, select { width: 100%; max-width: 300px; padding: 15px; background: rgba(0,0,0,0.5); border: 1px solid var(--neon); color: white; border-radius: 10px; margin-bottom: 15px; font-size: 1.1rem; text-align: center; outline: none; }
         option { background: var(--bg); color: white; }
         
         .btn { background: var(--glass); border: 1px solid var(--neon); color: var(--neon); padding: 15px; font-size: 1.1rem; font-weight: 700; border-radius: 10px; cursor: pointer; text-transform: uppercase; width: 100%; max-width: 300px; margin-bottom: 10px; transition: all 0.2s; }
-        .btn:active { background: var(--neon); color: var(--bg); }
+        .btn:active { background: var(--neon); color: var(--bg); transform: scale(0.95); }
         .btn-danger { border-color: var(--danger); color: var(--danger); }
         .btn-danger:active { background: var(--danger); color: white; }
+        .btn-purple { border-color: var(--purple); color: var(--purple); }
+        .btn-purple:active { background: var(--purple); color: white; }
         
-        /* Тик-Так */
-        .board { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; max-width: 300px; width: 100%; margin: 20px auto; }
-        .cell { background: var(--glass); border: 2px solid rgba(0,243,255,0.2); height: 90px; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 3rem; font-weight: 900; cursor: pointer; color: white; }
+        /* Тик-Так & Морской бой */
+        .board { display: grid; gap: 5px; width: 100%; margin: 20px auto; }
+        .cell { background: var(--glass); border: 2px solid rgba(0,243,255,0.2); aspect-ratio: 1; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; font-weight: 900; cursor: pointer; color: white; }
         
+        /* Шашки */
+        .chk-board { display: grid; grid-template-columns: repeat(8, 1fr); gap: 2px; max-width: 350px; margin: 15px auto; background: var(--neon); padding: 2px; border-radius: 5px; }
+        .chk-cell { background: #15151c; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; }
+        .chk-cell.white { background: #ffffff; }
+        .chk-piece { width: 80%; height: 80%; border-radius: 50%; cursor: pointer; transition: 0.2s; box-shadow: inset 0 0 8px rgba(0,0,0,0.8); }
+        .chk-piece.p1 { background: var(--neon); }
+        .chk-piece.p2 { background: var(--danger); }
+        .chk-piece.selected { transform: scale(1.15); border: 2px solid white; }
+
         /* Дурак */
-        .durak-board { width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: space-between; position: relative; max-width: 500px; }
-        .top-panel { display: flex; justify-content: space-between; align-items: center; padding: 0 10px; color: #a0a0b5; font-size: 0.9rem; }
-        
-        .card { width: 55px; height: 80px; background: #15151c; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: 900; font-size: 1.2rem; cursor: pointer; flex-shrink: 0; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        .card { width: 55px; height: 80px; background: #15151c; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: 900; font-size: 1.2rem; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
         .card.red { color: var(--danger); border-color: rgba(255,0,85,0.3); }
-        .card.black { color: white; }
-        .card:active { transform: translateY(-5px); border-color: var(--neon); }
-        
         .hand { display: flex; justify-content: center; flex-wrap: wrap; gap: 5px; margin-top: 10px; min-height: 85px; }
-        .table-area { flex-grow: 1; border: 1px dashed rgba(0, 243, 255, 0.3); border-radius: 15px; margin: 15px 0; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 10px; padding: 10px; background: rgba(255, 255, 255, 0.02); }
         
-        .controls { display: flex; gap: 10px; justify-content: center; margin-bottom: 10px; }
-        .controls .btn { padding: 10px; font-size: 0.9rem; margin: 0; }
-        
-        .trump-card { transform: rotate(90deg); margin-left: 10px; width: 40px; height: 60px; font-size: 0.9rem; }
+        /* Пинг-Понг */
+        #pong-container { width: 100%; max-width: 400px; aspect-ratio: 1; background: #111; border: 2px solid var(--neon); position: relative; touch-action: none; border-radius: 10px; overflow: hidden; }
+        .pong-paddle { position: absolute; width: 4%; height: 20%; background: white; border-radius: 5px; }
+        #pong-ball { position: absolute; width: 5%; height: 5%; background: var(--success); border-radius: 50%; transform: translate(-50%, -50%); box-shadow: 0 0 10px var(--success); }
     </style>
 </head>
 <body>
 
-    <!-- Меню -->
-    <div id="lobby-screen" class="screen active">
+    <div id="main-menu" class="screen active">
         <h1>ZLOSMANS <span>HUB</span></h1>
+        <p>Выбери формат тусовки</p>
+        <button class="btn btn-purple" onclick="showScreen('offline-menu')">🍻 ОФФЛАЙН (Рядом)</button>
+        <button class="btn" onclick="showScreen('online-lobby')">🌐 ОНЛАЙН (Сетевая)</button>
+    </div>
+
+    <div id="offline-menu" class="screen">
+        <h1>ОФФЛАЙН <span>ИГРЫ</span></h1>
+        <button class="btn" onclick="showScreen('mafia-setup')">🕵️‍♂️ Кастомная Мафия</button>
+        <button class="btn" onclick="showScreen('party-screen')">😈 Рулетка Фантов</button>
+        <button class="btn btn-danger" onclick="showScreen('main-menu')" style="margin-top: 30px;">Назад</button>
+    </div>
+
+    <div id="mafia-setup" class="screen">
+        <h1>Настройка <span>Мафии</span></h1>
+        <input type="number" id="mafia-count" min="4" max="15" value="6" placeholder="Кол-во игроков">
+        <button class="btn" onclick="startOfflineMafia()">Начать раздачу</button>
+        <button class="btn btn-danger" onclick="showScreen('offline-menu')">Назад</button>
+    </div>
+
+    <div id="mafia-game" class="screen">
+        <h1>Тайная <span>Роль</span></h1>
+        <p>Передайте телефон игроку <strong>№<span id="mafia-player-num" style="color:var(--neon); font-size:1.5rem;">1</span></strong></p>
+        <div class="glass-box">
+            <h2 id="mafia-hidden-text">Нажми, чтобы увидеть</h2>
+            <div id="mafia-role-reveal" style="font-size: 2rem; font-weight: 900; margin: 20px 0; display: none;">МАФИЯ</div>
+            <p id="mafia-role-desc" style="display:none;"></p>
+        </div>
+        <button class="btn" id="btn-show-role" onclick="showMafiaRole()">👀 Показать роль</button>
+        <button class="btn btn-danger" id="btn-next-role" style="display:none;" onclick="nextMafiaRole()">Скрыть и передать</button>
+    </div>
+
+    <div id="party-screen" class="screen">
+        <h1>Злая <span>Рулетка</span></h1>
+        <div class="glass-box" style="min-height: 150px; display:flex; align-items:center; justify-content:center;">
+            <h2 id="party-task">Жми кнопку!</h2>
+        </div>
+        <button class="btn" onclick="generateTask()">🎲 Крутить</button>
+        <button class="btn btn-danger" onclick="showScreen('offline-menu')">Назад</button>
+    </div>
+
+
+    <div id="online-lobby" class="screen">
+        <h1>ZLOSMANS <span>ONLINE</span></h1>
         <select id="game-type">
-            <option value="durak">🃏 Карты: Дурак</option>
+            <option value="pingpong">🏓 Пинг-Понг Онлайн</option>
+            <option value="durak">🃏 Дурак Онлайн</option>
+            <option value="seabattle">🚢 Морской Бой Онлайн</option>
+            <option value="checkers">🏁 Шашки Онлайн</option>
             <option value="tictactoe">✖️ Крестики-Нолики</option>
+            <option value="quiz">🧠 Квиз-Батл Онлайн</option>
         </select>
         <input type="text" id="player-name" placeholder="Твое имя">
-        <input type="text" id="room-id" placeholder="Код комнаты (напр. 123)">
-        <button class="btn" onclick="joinRoom()">Играть</button>
+        <input type="text" id="room-id" placeholder="Код комнаты (напр. 777)">
+        <button class="btn" onclick="joinOnlineRoom()">Войти в комнату</button>
+        <button class="btn btn-danger" onclick="showScreen('main-menu')">Назад</button>
     </div>
 
-    <!-- Крестики -->
-    <div id="tictactoe-screen" class="screen">
-        <h2>Комната: <span class="display-room"></span></h2>
-        <p id="tic-status" style="margin: 10px 0;">Ожидание игрока...</p>
-        <div class="board" id="tic-board">
-            <div class="cell" onclick="makeTicMove(0)"></div>
-            <div class="cell" onclick="makeTicMove(1)"></div>
-            <div class="cell" onclick="makeTicMove(2)"></div>
-            <div class="cell" onclick="makeTicMove(3)"></div>
-            <div class="cell" onclick="makeTicMove(4)"></div>
-            <div class="cell" onclick="makeTicMove(5)"></div>
-            <div class="cell" onclick="makeTicMove(6)"></div>
-            <div class="cell" onclick="makeTicMove(7)"></div>
-            <div class="cell" onclick="makeTicMove(8)"></div>
+    <div id="pingpong-screen" class="screen">
+        <h2>Счет: <span id="pong-score" style="color:var(--neon)">0 : 0</span></h2>
+        <p style="color:gray; font-size:0.8rem;">Двигай пальцем вверх-вниз по черному полю</p>
+        <div id="pong-container">
+            <div id="pong-p1" class="pong-paddle" style="left:2%; top:40%; background:var(--neon);"></div>
+            <div id="pong-p2" class="pong-paddle" style="right:2%; top:40%; background:var(--danger);"></div>
+            <div id="pong-ball"></div>
         </div>
+        <button class="btn btn-danger" onclick="leaveOnline()" style="margin-top:20px;">Выход</button>
     </div>
 
-    <!-- Дурак -->
+    <div id="tictactoe-screen" class="screen">
+        <h2 id="on-tic-status">Ожидание...</h2>
+        <div class="board" id="on-tic-board" style="grid-template-columns: repeat(3, 1fr); max-width:300px;">
+            <div class="cell" onclick="makeOnTicMove(0)"></div><div class="cell" onclick="makeOnTicMove(1)"></div><div class="cell" onclick="makeOnTicMove(2)"></div>
+            <div class="cell" onclick="makeOnTicMove(3)"></div><div class="cell" onclick="makeOnTicMove(4)"></div><div class="cell" onclick="makeOnTicMove(5)"></div>
+            <div class="cell" onclick="makeOnTicMove(6)"></div><div class="cell" onclick="makeOnTicMove(7)"></div><div class="cell" onclick="makeOnTicMove(8)"></div>
+        </div>
+        <button class="btn btn-danger" onclick="leaveOnline()">Выход</button>
+    </div>
+
+    <div id="checkers-screen" class="screen">
+        <h2 id="chk-status">Ожидание...</h2>
+        <div class="chk-board" id="chk-board-ui"></div>
+        <button class="btn btn-danger" onclick="leaveOnline()" style="margin-top: 20px;">Выход</button>
+    </div>
+
+    <div id="seabattle-screen" class="screen">
+        <h2>Морской Бой | Ход: <span id="sea-turn" style="color:var(--neon)">...</span></h2>
+        <div style="display:flex; gap:10px; margin: 15px 0;"><div style="background:rgba(0, 255, 100, 0.2); width:15px; height:15px; border-radius:3px;"></div> Твои корабли</div>
+        <div class="board" id="sea-board-ui" style="grid-template-columns: repeat(10, 1fr); max-width:340px;"></div>
+        <button class="btn btn-danger" onclick="leaveOnline()">Выход</button>
+    </div>
+
+    <div id="quiz-screen" class="screen">
+        <h2 id="quiz-q-text" style="margin-bottom:20px;">Загрузка вопроса...</h2>
+        <div id="quiz-options" style="display:flex; flex-direction:column; width:100%; max-width:300px; gap:10px;"></div>
+        <h3 style="margin-top:20px;">Твой счет: <span id="quiz-my-score" style="color:var(--success)">0</span></h3>
+        <button class="btn btn-danger" onclick="leaveOnline()" style="margin-top:20px;">Выход</button>
+    </div>
+
     <div id="durak-screen" class="screen" style="justify-content: flex-start;">
-        <div class="durak-board">
-            
-            <div class="top-panel">
-                <div style="text-align: left;">
-                    Осталось: <span id="cards-left" style="color:white; font-weight:bold;">36</span><br>
-                    У врага: <span id="opp-cards" style="color:var(--danger); font-weight:bold;">0</span> шт.
-                </div>
-                <div style="display: flex; align-items: center;">
-                    Козырь:
-                    <div id="trump-display" class="card trump-card"></div>
-                </div>
+        <div style="width: 100%; max-width: 500px; display:flex; flex-direction:column; height:90vh;">
+            <div style="display: flex; justify-content: space-between; align-items: center; color: #a0a0b5;">
+                <div style="text-align: left;">Осталось: <span id="cards-left" style="color:white;">36</span><br>У врага: <span id="opp-cards" style="color:var(--danger);">0</span> шт.</div>
+                <div style="display: flex; align-items: center;">Козырь:<div id="trump-display" class="card" style="transform: rotate(90deg); margin-left: 10px; width: 40px; height: 60px; font-size: 0.9rem;"></div></div>
             </div>
-
-            <div class="table-area" id="durak-table">
-                <p style="color: gray; width: 100%;">Ждем второго игрока...</p>
-            </div>
-
-            <div class="controls" id="durak-controls" style="display:none;">
+            <div style="flex-grow: 1; border: 1px dashed rgba(0, 243, 255, 0.3); border-radius: 15px; margin: 15px 0; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 10px; padding: 10px;" id="durak-table"></div>
+            <div style="display:flex; gap:10px; justify-content:center; margin-bottom:10px;" id="durak-controls" style="display:none;">
                 <button class="btn btn-danger" onclick="socket.emit('durak_take', currentRoom)">Беру</button>
                 <button class="btn" onclick="socket.emit('durak_bito', currentRoom)">Бито</button>
             </div>
-
             <div class="hand" id="my-hand"></div>
-            
+            <button class="btn btn-danger" onclick="leaveOnline()" style="margin-top: 15px;">Выход</button>
         </div>
     </div>
 
+
     <script src="/socket.io/socket.io.js"></script>
     <script>
-        const socket = io();
-        let currentRoom = "";
-        let currentGame = "";
-        let mySymbol = "";
+        function showScreen(id) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); window.scrollTo(0, 0); }
 
-        function joinRoom() {
+        // --- ОФФЛАЙН ЛОГИКА ---
+        let mafiaRoles = [], currentMafiaIndex = 0;
+        function startOfflineMafia() {
+            let count = parseInt(document.getElementById('mafia-count').value);
+            mafiaRoles = ['МАФИЯ', 'ДОКТОР 💊', 'ШЕРИФ 🔫']; 
+            while(mafiaRoles.length < count) mafiaRoles.push('МИРНЫЙ ЖИТЕЛЬ 🧑‍🌾');
+            mafiaRoles.sort(() => Math.random() - 0.5);
+            currentMafiaIndex = 0;
+            document.getElementById('mafia-player-num').innerText = 1;
+            document.getElementById('mafia-hidden-text').style.display = 'block'; document.getElementById('mafia-role-reveal').style.display = 'none';
+            document.getElementById('btn-show-role').style.display = 'block'; document.getElementById('btn-next-role').style.display = 'none';
+            showScreen('mafia-game');
+        }
+        function showMafiaRole() {
+            document.getElementById('mafia-hidden-text').style.display = 'none';
+            document.getElementById('mafia-role-reveal').innerText = mafiaRoles[currentMafiaIndex];
+            document.getElementById('mafia-role-reveal').style.display = 'block';
+            document.getElementById('btn-show-role').style.display = 'none'; document.getElementById('btn-next-role').style.display = 'block';
+        }
+        function nextMafiaRole() {
+            currentMafiaIndex++;
+            if(currentMafiaIndex >= mafiaRoles.length) { alert("Город засыпает..."); showScreen('offline-menu'); } 
+            else { document.getElementById('mafia-player-num').innerText = currentMafiaIndex + 1; document.getElementById('mafia-hidden-text').style.display = 'block'; document.getElementById('mafia-role-reveal').style.display = 'none'; document.getElementById('btn-show-role').style.display = 'block'; document.getElementById('btn-next-role').style.display = 'none'; }
+        }
+
+        const tasks = ["Спой припев", "Покажи последнюю фотку", "Приседай 15 раз", "Выпей воды"];
+        function generateTask() { document.getElementById('party-task').innerText = tasks[Math.floor(Math.random() * tasks.length)]; }
+
+
+        // --- ОНЛАЙН ЛОГИКА ---
+        const socket = io();
+        let currentRoom = "", currentGame = "", mySymbol = "", selectedChk = null;
+
+        function joinOnlineRoom() {
             const name = document.getElementById('player-name').value.trim();
             currentRoom = document.getElementById('room-id').value.trim();
             currentGame = document.getElementById('game-type').value;
-            
-            if (!name || !currentRoom) return;
-
-            document.querySelectorAll('.display-room').forEach(el => el.innerText = currentRoom);
-            document.getElementById('lobby-screen').classList.remove('active');
-            
-            if(currentGame === 'tictactoe') document.getElementById('tictactoe-screen').classList.add('active');
-            if(currentGame === 'durak') document.getElementById('durak-screen').classList.add('active');
-
+            if (!name || !currentRoom) return alert("Введите имя и код!");
+            if(currentGame === 'tictactoe') showScreen('tictactoe-screen');
+            if(currentGame === 'durak') showScreen('durak-screen');
+            if(currentGame === 'checkers') showScreen('checkers-screen');
+            if(currentGame === 'seabattle') showScreen('seabattle-screen');
+            if(currentGame === 'quiz') showScreen('quiz-screen');
+            if(currentGame === 'pingpong') showScreen('pingpong-screen');
             socket.emit('join_room', { roomId: currentRoom, playerName: name, gameType: currentGame });
         }
-
+        function leaveOnline() { window.location.reload(); }
         socket.on('assigned_symbol', (symbol) => { mySymbol = symbol; });
 
+        // Управление Пинг-Понгом (Свайпы по экрану)
+        const pongBox = document.getElementById('pong-container');
+        pongBox.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            let rect = pongBox.getBoundingClientRect();
+            let y = ((e.touches[0].clientY - rect.top) / rect.height) * 100;
+            y = Math.max(0, Math.min(80, y - 10)); // Ограничители ракетки
+            socket.emit('pong_move', { roomId: currentRoom, y: y, symbol: mySymbol });
+        });
+
+        // ПИНГ-ПОНГ РЕНДЕР (Реальное время)
+        socket.on('update_pong', (p) => {
+            document.getElementById('pong-score').innerText = `${p.s1} : ${p.s2}`;
+            document.getElementById('pong-p1').style.top = p.p1Y + '%';
+            document.getElementById('pong-p2').style.top = p.p2Y + '%';
+            document.getElementById('pong-ball').style.left = p.bX + '%';
+            document.getElementById('pong-ball').style.top = p.bY + '%';
+        });
+
+        // ОСТАЛЬНЫЕ ИГРЫ РЕНДЕР
         socket.on('update_game', (data) => {
             if (data.gameType === 'tictactoe') {
-                const cells = document.querySelectorAll('.cell');
-                data.board.forEach((val, i) => { 
-                    cells[i].innerText = val; 
-                    cells[i].style.color = val === 'X' ? 'var(--neon)' : 'var(--danger)';
-                });
-                const tStatus = document.getElementById('tic-status');
-                if(!data.active) tStatus.innerText = "Ожидание второго игрока...";
-                else tStatus.innerText = data.turn === mySymbol ? "ТВОЙ ХОД!" : "Ход противника...";
+                const cells = document.getElementById('on-tic-board').children;
+                data.board.forEach((val, i) => { cells[i].innerText = val; cells[i].style.color = val === 'X' ? 'var(--neon)' : 'var(--danger)'; });
+                document.getElementById('on-tic-status').innerText = !data.active ? "Ожидание..." : (data.turn === mySymbol ? "ТВОЙ ХОД!" : "Ход противника...");
             } 
             else if (data.gameType === 'durak') {
-                if(data.active) {
-                    document.getElementById('durak-controls').style.display = 'flex';
-                }
-
-                document.getElementById('opp-cards').innerText = data.opponentCardsCount;
-                document.getElementById('cards-left').innerText = data.cardsLeft;
-                
+                if(data.active) document.getElementById('durak-controls').style.display = 'flex';
+                document.getElementById('opp-cards').innerText = data.opponentCardsCount; document.getElementById('cards-left').innerText = data.cardsLeft;
                 const t = document.getElementById('trump-display');
-                if (data.trump) {
-                    t.className = `card trump-card ${data.trump.color}`;
-                    t.innerHTML = `${data.trump.rank}<br>${data.trump.suit}`;
-                } else {
-                    t.style.display = 'none'; // Если козырь забрали
-                }
-
-                // Рендер моих карт
-                const handBox = document.getElementById('my-hand');
-                handBox.innerHTML = '';
-                data.myHand.forEach((card, index) => {
-                    handBox.innerHTML += `<div class="card ${card.color}" onclick="socket.emit('play_card', { roomId: '${currentRoom}', cardIndex: ${index} })">${card.rank}<br>${card.suit}</div>`;
+                if (data.trump) { t.className = `card ${data.trump.color}`; t.innerHTML = `${data.trump.rank}<br>${data.trump.suit}`; t.style.display = 'flex'; } else t.style.display = 'none';
+                document.getElementById('my-hand').innerHTML = '';
+                data.myHand.forEach((c, i) => { document.getElementById('my-hand').innerHTML += `<div class="card ${c.color}" onclick="socket.emit('play_card', { roomId: '${currentRoom}', cardIndex: ${i} })">${c.rank}<br>${c.suit}</div>`; });
+                document.getElementById('durak-table').innerHTML = '';
+                data.table.forEach(c => { document.getElementById('durak-table').innerHTML += `<div class="card ${c.color}">${c.rank}<br>${c.suit}</div>`; });
+            }
+            else if (data.gameType === 'checkers') {
+                document.getElementById('chk-status').innerText = data.active ? (data.turn === mySymbol ? "ТВОЙ ХОД!" : "Ход противника...") : "Ждем...";
+                document.getElementById('chk-board-ui').innerHTML = '';
+                data.chkBoard.forEach((val, i) => {
+                    let c = `<div class="chk-cell ${ (Math.floor(i / 8) + i % 8) % 2 === 0 ? 'white' : 'black'}" onclick="chkClick(${i})">`;
+                    if (val === 1) c += `<div class="chk-piece p1 ${selectedChk === i ? 'selected' : ''}"></div>`;
+                    if (val === 2) c += `<div class="chk-piece p2 ${selectedChk === i ? 'selected' : ''}"></div>`;
+                    document.getElementById('chk-board-ui').innerHTML += c + `</div>`;
                 });
-
-                // Рендер стола
-                const tableBox = document.getElementById('durak-table');
-                tableBox.innerHTML = '';
-                if(data.table.length === 0 && data.active) {
-                    tableBox.innerHTML = '<p style="color: gray;">Стол пуст. Ваш ход!</p>';
-                }
-                data.table.forEach(card => {
-                    tableBox.innerHTML += `<div class="card ${card.color}">${card.rank}<br>${card.suit}</div>`;
+            }
+            else if (data.gameType === 'seabattle') {
+                document.getElementById('sea-turn').innerText = data.turn === socket.id ? "ТВОЙ!" : "Врага";
+                document.getElementById('sea-board-ui').innerHTML = '';
+                const targetF = mySymbol === "X" ? data.sea2 : data.sea1;
+                const myF = mySymbol === "X" ? data.sea1 : data.sea2;
+                targetF.forEach((val, i) => {
+                    let col = "var(--glass)"; if (val === 2) col = "#333"; if (val === 3) col = "var(--danger)";
+                    if (myF[i] === 1 && val === 0) col = "rgba(0, 255, 100, 0.2)"; // Видим свои
+                    document.getElementById('sea-board-ui').innerHTML += `<div style="background:${col}; aspect-ratio:1; display:flex; align-items:center; justify-content:center; cursor:pointer;" onclick="socket.emit('sea_shoot', {roomId:'${currentRoom}', index:${i}})">${val === 3 ? '❌' : val === 2 ? '•' : ''}</div>`;
                 });
+            }
+            else if (data.gameType === 'quiz') {
+                document.getElementById('quiz-my-score').innerText = data.quizScores[socket.id] || 0;
+                if (!data.active) { document.getElementById('quiz-q-text').innerText = "КОНЕЦ ИГРЫ!"; document.getElementById('quiz-options').innerHTML = ''; return; }
+                document.getElementById('quiz-q-text').innerText = data.quizQuestion.q;
+                document.getElementById('quiz-options').innerHTML = '';
+                data.quizQuestion.a.forEach((ans, idx) => { document.getElementById('quiz-options').innerHTML += `<button class="btn" onclick="socket.emit('quiz_answer', {roomId:'${currentRoom}', answerIndex:${idx}})">${ans}</button>`; });
             }
         });
 
-        function makeTicMove(index) {
-            socket.emit('make_move', { roomId: currentRoom, index: index, symbol: mySymbol });
-        }
+        function makeOnTicMove(index) { socket.emit('make_move', { roomId: currentRoom, index: index, symbol: mySymbol }); }
+        function chkClick(index) { if (selectedChk === null) { selectedChk = index; document.getElementById('chk-board-ui').children[index].firstChild?.classList.add('selected'); } else { socket.emit('move_checker', { roomId: currentRoom, from: selectedChk, to: index, symbol: mySymbol }); selectedChk = null; } }
     </script>
 </body>
 </html>
